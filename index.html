@@ -1,0 +1,419 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Earnly 2.0</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#071c29;color:#fff;font-family:Arial,sans-serif}
+header{padding:20px;background:#0c2938;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:26px;font-weight:bold;color:#33e6a1}
+main{max-width:750px;margin:auto;padding:18px 16px 100px}
+h2{font-size:22px}
+p,.muted{color:#adc5d0;line-height:1.5}
+.hero,.item,.plan{background:#123448;border:1px solid #245064;border-radius:16px;padding:20px;margin:14px 0}
+.hero{background:linear-gradient(130deg,#124b51,#123448)}
+button{cursor:pointer;border:0;border-radius:10px;padding:12px;font-weight:bold}
+.primary{background:#33e6a1;color:#071c29}
+.secondary{background:#245064;color:white}
+input,select{background:#123448;color:white;border:1px solid #396175;border-radius:10px;padding:13px;width:100%;margin:8px 0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.category{background:#123448;color:white;text-align:left;padding:20px;border:1px solid #245064}
+.category span{display:block;font-size:26px;margin-bottom:8px}
+.category:hover,.item:hover{border-color:#33e6a1}
+.page{display:none}
+.page.active{display:block}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.actions button{flex:1}
+.item h3{margin-top:0}
+.item a{color:#33e6a1}
+.tag{color:#33e6a1;font-size:13px}
+.notice{font-size:12px;color:#a9bdc8}
+nav{position:fixed;bottom:0;left:0;width:100%;background:#102e40;display:flex;justify-content:space-around;padding:12px 5px;border-top:1px solid #245064}
+nav button{background:none;color:#b8cbd4;font-size:13px}
+nav button.selected{color:#33e6a1}
+@media(min-width:600px){.grid{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">💸 EARNLY</div>
+  <span class="tag">FREE MEMBER</span>
+</header>
+
+<main>
+<section id="home" class="page active">
+  <div class="hero">
+    <h2>Discover your next opportunity</h2>
+    <p>Explore rewards, surveys, gaming, AI tasks and more.</p>
+    <button class="primary" onclick="showPage('explore')">
+      Explore Opportunities
+    </button>
+  </div>
+
+  <h2>Explore Categories</h2>
+  <div class="grid">
+    <button class="category" onclick="openCategory('surveys')"><span>📋</span>Surveys</button>
+    <button class="category" onclick="openCategory('gaming')"><span>🎮</span>Gaming</button>
+    <button class="category" onclick="openCategory('ai')"><span>🤖</span>AI Tasks</button>
+    <button class="category" onclick="openCategory('crypto')"><span>🪙</span>Crypto</button>
+    <button class="category" onclick="openCategory('microtasks')"><span>💼</span>Microtasks</button>
+    <button class="category" onclick="openCategory('websites')"><span>🌐</span>Websites</button>
+  </div>
+
+  <h2>Featured Opportunities</h2>
+  <div id="featured"></div>
+</section>
+
+<section id="explore" class="page">
+  <h2>🔎 Explore Opportunities</h2>
+  <input id="search" placeholder="Search opportunities..." oninput="renderListings()">
+  <select id="category" onchange="renderListings()">
+    <option value="all">All categories</option>
+    <option value="surveys">Surveys</option>
+    <option value="gaming">Gaming</option>
+    <option value="ai">AI Tasks</option>
+    <option value="microtasks">Microtasks</option>
+    <option value="websites">Website Testing</option>
+    <option value="crypto">Crypto</option>
+  </select>
+
+<label for="country">🌍 Your Country</label>
+<select id="country" onchange="renderListings()">
+  <option value="all">All countries</option>
+  <option value="Canada">🇨🇦 Canada</option>
+  <option value="United States">🇺🇸 United States</option>
+  <option value="United Kingdom">🇬🇧 United Kingdom</option>
+  <option value="India">🇮🇳 India</option>
+  <option value="Worldwide">🌎 Worldwide only</option>
+</select>
+
+  <select id="sort" onchange="renderListings()">
+    <option value="default">Default order</option>
+    <option value="name">Name A–Z</option>
+    <option value="verified">Verified first</option>
+  </select>
+  <p id="count" class="muted"></p>
+  <div id="listings"></div>
+</section>
+
+<section id="details" class="page">
+  <button class="secondary" onclick="showPage('explore')">
+    ← Back to Opportunities
+  </button>
+  <div id="details-content"></div>
+</section>
+
+<section id="saved" class="page">
+  <h2>🔖 Saved Opportunities</h2>
+  <p>Bookmark opportunities to revisit them later.</p>
+  <div id="saved-listings"></div>
+</section>
+
+<section id="profile" class="page">
+  <h2>👤 My Earnly</h2>
+  <div class="plan">
+    <h3>Free Membership</h3>
+    <p>Browse opportunities and save favourites.</p>
+  </div>
+  <div class="plan">
+    <h3>⭐ Premium — Coming Soon</h3>
+    <p>Planned: expanded discovery and advanced filters.</p>
+  </div>
+  <div class="plan">
+    <h3>👑 VIP — Coming Soon</h3>
+    <p>Planned: personalized alerts and additional tools.</p>
+  </div>
+  <p class="notice">Subscriptions and payments are not enabled yet.</p>
+</section>
+</main>
+
+<nav>
+  <button data-page="home" onclick="showPage('home')">🏠 Home</button>
+  <button data-page="explore" onclick="showPage('explore')">🧭 Explore</button>
+  <button data-page="saved" onclick="showPage('saved')">🔖 Saved</button>
+  <button data-page="profile" onclick="showPage('profile')">👤 Profile</button>
+</nav>
+
+<script>
+let opportunities=[];
+let saved=[];
+try{
+  const stored=JSON.parse(localStorage.getItem("earnly_saved")||"[]");
+  if(Array.isArray(stored)) saved=stored.filter(x=>typeof x==="string");
+}catch(e){saved=[]}
+
+function showPage(page){
+  document.querySelectorAll(".page").forEach(el=>el.classList.remove("active"));
+  const target = document.getElementById(page);
+if (!target) {
+  console.error("Earnly page not found:", page);
+  return;
+}
+target.classList.add("active");
+  document.querySelectorAll("nav button").forEach(btn=>{
+    btn.classList.toggle("selected",btn.dataset.page===page);
+  });
+  if(page==="explore")renderListings();
+  if(page==="saved")renderSaved();
+  window.scrollTo(0,0);
+}
+
+function openCategory(category){
+  document.getElementById("category").value=category;
+  showPage("explore");
+}
+
+function categoryMatches(item,filter){
+  if(filter==="all")return true;
+  const cat=String(item.category||"").toLowerCase();
+  const name=String(item.name||"").toLowerCase();
+  const text=cat+" "+name;
+  const terms={
+    surveys:["survey"],
+    gaming:["gaming","game"],
+    ai:["ai","artificial intelligence"],
+    microtasks:["microtask"],
+    websites:["website","web testing"],
+    crypto:["crypto","blockchain"]
+  };
+  return (terms[filter]||[filter]).some(term=>text.includes(term));
+}
+
+function itemKey(item){
+  return String(item.url||item.name||"");
+}
+
+function makeCard(item){
+  const card=document.createElement("div");
+  card.className="item";
+
+  const title=document.createElement("h3");
+  title.textContent=item.name||"Opportunity";
+
+  const company=document.createElement("p");
+  company.textContent=item.company||"Provider not specified";
+
+  const detail=document.createElement("p");
+  detail.textContent=item.description||"Check provider requirements.";
+
+  const meta=document.createElement("p");
+  meta.className="tag";
+  meta.textContent=(item.category||"General")+" • "+
+    (item.verified?"Marked verified":"Unverified");
+
+  const payout=document.createElement("p");
+  payout.className="notice";
+  payout.textContent="Payout: "+String(item.payout||"Not verified");
+
+  const actions=document.createElement("div");
+  actions.className="actions";
+
+  const bookmark=document.createElement("button");
+  bookmark.className="secondary";
+  const key=itemKey(item);
+  bookmark.textContent=saved.includes(key)?"★ Saved":"☆ Save";
+  bookmark.onclick=()=>{
+    if(saved.includes(key)){
+      saved=saved.filter(x=>x!==key);
+    }else{
+      saved.push(key);
+    }
+    try{localStorage.setItem("earnly_saved",JSON.stringify(saved))}
+    catch(e){}
+    renderListings();
+    renderSaved();
+    renderFeatured();
+  };
+  actions.appendChild(bookmark);
+
+const detailsButton = document.createElement("button");
+detailsButton.className = "secondary";
+detailsButton.textContent = "View Details";
+
+detailsButton.onclick = () => {
+  const index = opportunities.indexOf(item);
+  openDetails(index);
+};
+
+actions.appendChild(detailsButton);
+
+
+  if(typeof item.url==="string" && /^https?:\/\//i.test(item.url)){
+    const link=document.createElement("a");
+    link.href=item.url;
+    link.target="_blank";
+    link.rel="noopener noreferrer";
+    link.className="primary";
+    link.style.cssText="text-decoration:none;padding:12px;border-radius:10px;flex:1;text-align:center;font-weight:bold";
+    link.textContent="View Opportunity";
+link.style.color="#071c29";
+    actions.appendChild(link);
+  }
+
+  card.append(title,company,detail,meta,payout,actions);
+  return card;
+}
+
+function renderListings(){
+  const container=document.getElementById("listings");
+  const search=document.getElementById("search").value.toLowerCase();
+  const category=document.getElementById("category").value;
+  const sort=document.getElementById("sort").value;
+
+  
+const country = document.getElementById("country").value;
+
+let results = opportunities.filter(item => {
+  const matchesCategory = categoryMatches(item, category);
+
+  const matchesSearch =
+    [item.name, item.company, item.description, item.category]
+      .some(value =>
+        String(value || "").toLowerCase().includes(search)
+      );
+
+  const countries = Array.isArray(item.countries)
+    ? item.countries.map(c => String(c).toLowerCase().trim())
+    : [];
+
+  const selected = country.toLowerCase();
+
+  const matchesCountry =
+    country === "all" ||
+    (selected === "worldwide"
+      ? countries.includes("worldwide")
+      : countries.includes(selected) ||
+        countries.includes("worldwide"));
+
+  return matchesCategory && matchesSearch && matchesCountry;
+});
+
+
+  if(sort==="name")results.sort((a,b)=>
+    String(a.name||"").localeCompare(String(b.name||"")));
+  if(sort==="verified")results.sort((a,b)=>
+    Number(Boolean(b.verified))-Number(Boolean(a.verified)));
+
+  document.getElementById("count").textContent=results.length+" opportunities found";
+  container.replaceChildren();
+
+  if(!results.length){
+    const empty=document.createElement("p");
+    empty.textContent="No matching opportunities found.";
+    container.appendChild(empty);
+    return;
+  }
+
+  results.forEach(item=>container.appendChild(makeCard(item)));
+}
+
+function renderSaved(){
+  const container=document.getElementById("saved-listings");
+  container.replaceChildren();
+  const results=opportunities.filter(item=>saved.includes(itemKey(item)));
+  if(!results.length){
+    const empty=document.createElement("p");
+    empty.textContent="No saved opportunities yet.";
+    container.appendChild(empty);
+  }
+  results.forEach(item=>container.appendChild(makeCard(item)));
+}
+
+function renderFeatured(){
+  const container=document.getElementById("featured");
+  container.replaceChildren();
+  opportunities.slice(0,3).forEach(item=>container.appendChild(makeCard(item)));
+}
+
+fetch("opportunities.json")
+  .then(response=>{
+    if(!response.ok)throw new Error("Cannot load data");
+    return response.json();
+  })
+  .then(data=>{
+    const list=Array.isArray(data)?data:
+      Array.isArray(data.opportunities)?data.opportunities:[];
+    opportunities=list.filter(item=>item && typeof item==="object");
+    renderListings();
+    renderSaved();
+    renderFeatured();
+  })
+  .catch(()=>{
+    document.getElementById("listings").textContent=
+      "Unable to load opportunities. Check your local server.";
+    document.getElementById("featured").textContent=
+      "Opportunity data unavailable.";
+  });
+
+
+  const detailsButton = document.createElement("button");
+  detailsButton.className = "secondary";
+  detailsButton.textContent = "View Details";
+  detailsButton.onclick = () => {
+    const index = opportunities.indexOf(item);
+    openDetails(index);
+  };
+  actions.appendChild(detailsButton);
+
+
+function openDetails(index) {
+  const item = opportunities[index];
+  if (!item) {
+    alert("Opportunity not found.");
+    return;
+  }
+
+  const container = document.getElementById("details-content");
+  if (!container) {
+    alert("Details page is missing.");
+    return;
+  }
+
+  container.replaceChildren();
+
+  const card = document.createElement("div");
+  card.className = "item";
+
+  const title = document.createElement("h2");
+  title.textContent = item.name || "Opportunity";
+  card.appendChild(title);
+
+  const fields = [
+    ["Provider", item.company || "Not specified"],
+    ["Category", item.category || "General"],
+    ["Description", item.description || "Not provided"],
+    ["Payout", item.payout || "Unverified"],
+    ["Estimated time", item.estimated_time || "Not provided"],
+    ["Requirements", item.requirements || "Check provider"],
+    ["Status", item.verified ? "Marked verified" : "Unverified"]
+  ];
+
+  fields.forEach(([label, value]) => {
+    const p = document.createElement("p");
+    p.textContent = label + ": " + String(value);
+    card.appendChild(p);
+  });
+
+  if (typeof item.url === "string" &&
+      /^https?:\/\//i.test(item.url)) {
+    const link = document.createElement("a");
+    link.href = item.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "Visit Provider";
+    link.style.color = "#33e6a1";
+    card.appendChild(link);
+  }
+
+  container.appendChild(card);
+  showPage("details");
+}
+
+showPage("home");
+</script>
+</body>
+</html>
