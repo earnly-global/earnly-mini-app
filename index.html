@@ -1,6 +1,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -114,6 +115,13 @@ nav button.selected{color:#33e6a1}
 </section>
 
 <section id="profile" class="page">
+
+<div class="plan" id="telegram-account">
+  <h3>👤 Telegram Account</h3>
+  <p id="telegram-name">Checking Telegram connection...</p>
+  <p id="telegram-status"></p>
+</div>
+
   <h2>👤 My Earnly</h2>
   <div class="plan">
     <h3>Free Membership</h3>
@@ -414,6 +422,39 @@ function openDetails(index) {
 }
 
 showPage("home");
+
+function initializeTelegram() {
+  const nameElement = document.getElementById("telegram-name");
+  const statusElement = document.getElementById("telegram-status");
+
+  const tg = window.Telegram?.WebApp;
+
+  if (!tg || !tg.initData) {
+    nameElement.textContent = "Guest User";
+    statusElement.textContent =
+      "Open Earnly through Telegram to see your profile.";
+    return;
+  }
+
+  tg.ready();
+  tg.expand();
+
+  const user = tg.initDataUnsafe?.user;
+
+  if (user) {
+    const name = [user.first_name, user.last_name]
+      .filter(Boolean).join(" ");
+
+    nameElement.textContent = "Welcome, " + (name || "Member");
+    statusElement.textContent = "Telegram profile detected";
+  } else {
+    nameElement.textContent = "Telegram User";
+    statusElement.textContent = "Profile information unavailable";
+  }
+}
+
+initializeTelegram();
+
 </script>
 </body>
 </html>
