@@ -455,7 +455,7 @@ async function connectEarnlyAccount() {
   } catch (error) {
     console.error("Earnly account connection:", error);
     if (status) {
-      status.textContent = "Account connection failed. Please try again.";
+      status.textContent = "Connection failed: " + error.message;
     }
   }
 }
