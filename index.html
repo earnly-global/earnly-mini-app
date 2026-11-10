@@ -423,6 +423,52 @@ function openDetails(index) {
 
 showPage("home");
 
+
+async function connectEarnlyAccount() {
+  const status = document.getElementById("telegram-status");
+  const tg = window.Telegram?.WebApp;
+
+  if (!tg?.initData) {
+    if (status) {
+      status.textContent = "Open Earnly in Telegram to connect your account.";
+    }
+    return;
+  }
+
+  if (status) {
+    status.textContent = "Connecting your Earnly account...";
+  }
+
+  try {
+    const response = await fetch(
+      "https://byywbcdwhtiylexvqokj.supabase.co/functions/v1/hyper-endpoint",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ initData: tg.initData })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Account connection failed");
+    }
+
+    if (status) {
+      status.textContent =
+        "Account connected — " +
+        result.membership.tier.toUpperCase() 
+        " MEMBER";
+    }
+  } catch (error) {
+    console.error("Earnly account connection:", error);
+    if (status) {
+      status.textContent = "Account connection failed. Please try again.";
+    }
+  }
+}
+
 function initializeTelegram() {
   const nameElement = document.getElementById("telegram-name");
   const statusElement = document.getElementById("telegram-status");
@@ -454,7 +500,7 @@ function initializeTelegram() {
 }
 
 initializeTelegram();
-
+connectEarnlyAccount();
 </script>
 </body>
 </html>
