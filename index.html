@@ -449,8 +449,8 @@ async function connectEarnlyAccount() {
     if (status) {
       status.textContent =
         "Account connected — " +
-        result.membership.tier.toUpperCase() 
-        " MEMBER";
+        result.membership.tier.toUpperCase() +
+" MEMBER";
     }
   } catch (error) {
     console.error("Earnly account connection:", error);
