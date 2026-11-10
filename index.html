@@ -358,15 +358,6 @@ fetch("opportunities.json")
   });
 
 
-  const detailsButton = document.createElement("button");
-  detailsButton.className = "secondary";
-  detailsButton.textContent = "View Details";
-  detailsButton.onclick = () => {
-    const index = opportunities.indexOf(item);
-    openDetails(index);
-  };
-  actions.appendChild(detailsButton);
-
 
 function openDetails(index) {
   const item = opportunities[index];
