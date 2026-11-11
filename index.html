@@ -503,6 +503,44 @@ function initializeTelegram() {
   }
 }
 
+async function testPremiumInvoice() {
+  const tg = window.Telegram?.WebApp;
+
+  if (!tg?.initData) {
+    alert("Open Earnly through Telegram to test checkout.");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "https://byywbcwdhtiylexvqokj.supabase.co/functions/v1/earnly-stars-payments",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "create_invoice",
+          tier: "premium",
+          initData: tg.initData
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.invoice_link) {
+      throw new Error(result.error || "Invoice creation failed");
+    }
+
+    alert("Premium invoice created successfully. No payment was made.");
+    console.log("Earnly invoice test succeeded.");
+  } catch (error) {
+    alert("Invoice test failed: " + error.message);
+    console.error("Earnly invoice test:", error);
+  }
+}
+
 initializeTelegram();
 connectEarnlyAccount();
 </script>
