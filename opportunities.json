@@ -140,8 +140,10 @@
     "verified": false,
     "source": "Curated platform catalog",
     "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
-    "verification_status": "not_independently_verified",
-    "opportunity_type": "earning_platform"
+    "verification_status": "platform_catalog_not_live_offer",
+    "opportunity_type": "earning_platform",
+    "page_check_status": "reachable",
+    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
   },
   {
     "name": "CloudResearch Connect",
@@ -156,8 +158,10 @@
     "verified": false,
     "source": "Curated platform catalog",
     "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
-    "verification_status": "not_independently_verified",
-    "opportunity_type": "earning_platform"
+    "verification_status": "platform_catalog_not_live_offer",
+    "opportunity_type": "earning_platform",
+    "page_check_status": "reachable",
+    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
   },
   {
     "name": "Freecash",
@@ -172,8 +176,10 @@
     "verified": false,
     "source": "Curated platform catalog",
     "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
-    "verification_status": "not_independently_verified",
-    "opportunity_type": "earning_platform"
+    "verification_status": "platform_catalog_not_live_offer",
+    "opportunity_type": "earning_platform",
+    "page_check_status": "reachable",
+    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
   },
   {
     "name": "Swagbucks",
@@ -188,8 +194,10 @@
     "verified": false,
     "source": "Curated platform catalog",
     "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
-    "verification_status": "not_independently_verified",
-    "opportunity_type": "earning_platform"
+    "verification_status": "platform_catalog_not_live_offer",
+    "opportunity_type": "earning_platform",
+    "page_check_status": "reachable",
+    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
   },
   {
     "name": "PlaytestCloud",
@@ -204,8 +212,10 @@
     "verified": false,
     "source": "Curated platform catalog",
     "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
-    "verification_status": "not_independently_verified",
-    "opportunity_type": "earning_platform"
+    "verification_status": "platform_catalog_not_live_offer",
+    "opportunity_type": "earning_platform",
+    "page_check_status": "reachable",
+    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
   },
   {
     "name": "UserTesting",
@@ -220,8 +230,10 @@
     "verified": false,
     "source": "Curated platform catalog",
     "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
-    "verification_status": "not_independently_verified",
-    "opportunity_type": "earning_platform"
+    "verification_status": "platform_catalog_not_live_offer",
+    "opportunity_type": "earning_platform",
+    "page_check_status": "reachable",
+    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
   },
   {
     "name": "User Interviews",
@@ -236,8 +248,10 @@
     "verified": false,
     "source": "Curated platform catalog",
     "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
-    "verification_status": "not_independently_verified",
-    "opportunity_type": "earning_platform"
+    "verification_status": "platform_catalog_not_live_offer",
+    "opportunity_type": "earning_platform",
+    "page_check_status": "reachable",
+    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
   },
   {
     "name": "Respondent",
@@ -252,8 +266,10 @@
     "verified": false,
     "source": "Curated platform catalog",
     "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
-    "verification_status": "not_independently_verified",
-    "opportunity_type": "earning_platform"
+    "verification_status": "platform_catalog_not_live_offer",
+    "opportunity_type": "earning_platform",
+    "page_check_status": "reachable",
+    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
   },
   {
     "name": "Senior React Full-stack Developer",
