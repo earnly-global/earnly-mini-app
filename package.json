@@ -1,0 +1,8 @@
+{
+  "name": "earnly-v5-2-isolated-security-tests",
+  "private": true,
+  "version": "5.2.0",
+  "type": "module",
+  "scripts": {"test": "node --test test/*.test.mjs"},
+  "engines": {"node": ">=20"}
+}
