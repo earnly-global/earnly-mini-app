@@ -709,6 +709,57 @@ async function testPremiumInvoice() {
 }
 
 
+
+// V5 hotfix: restore the V4 membership portal and preferences handlers.
+async function loadMemberPortal() {
+  const el = document.getElementById('subscription-details');
+  const tg = window.Telegram?.WebApp;
+  if (!tg?.initData) {
+    if (el) el.textContent = 'Open Earnly inside Telegram to check your subscription.';
+    return;
+  }
+  if (el) el.textContent = 'Checking subscription details...';
+  try {
+    const response = await fetch('https://byywbcwdhtiylexvqokj.supabase.co/functions/v1/earnly-member-portal', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({action:'status', initData:tg.initData})
+    });
+    const result = await response.json();
+    if (!response.ok || !result.ok) throw new Error(result.error || 'Membership portal unavailable');
+    const membership = result.membership || {};
+    const subscription = result.subscription || {};
+    if (el) el.textContent = 'Membership: ' + String(membership.tier || 'free').toUpperCase()
+      + (membership.expires_at ? ' · Expires: ' + new Date(membership.expires_at).toLocaleDateString() : '')
+      + ' · Renewal: ' + String(subscription.renewal_status || 'unknown');
+    const country = document.getElementById('alert-country');
+    const category = document.getElementById('alert-category');
+    if (country && result.preferences?.country && [...country.options].some(o=>o.value===result.preferences.country)) country.value=result.preferences.country;
+    if (category && result.preferences?.category && [...category.options].some(o=>o.value===result.preferences.category)) category.value=result.preferences.category;
+  } catch(error) {
+    if (el) el.textContent = 'Subscription lookup failed: ' + error.message;
+    console.error('Member portal:',error);
+  }
+}
+
+async function saveMemberPreferences() {
+  const el=document.getElementById('preferences-status');
+  const initData=window.Telegram?.WebApp?.initData;
+  if (!initData) {if(el) el.textContent='Open Earnly inside Telegram to save preferences.';return;}
+  if(el) el.textContent='Saving preferences...';
+  try {
+    const response=await fetch('https://byywbcwdhtiylexvqokj.supabase.co/functions/v1/earnly-member-portal', {
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'save_preferences',initData,preferences:{
+        country:document.getElementById('alert-country').value,
+        category:document.getElementById('alert-category').value
+      }})
+    });
+    const result=await response.json();
+    if(!response.ok||!result.ok) throw new Error(result.error||'Could not save preferences');
+    if(el) el.textContent='Preferences saved successfully.';
+  }catch(error){if(el) el.textContent='Save failed: '+error.message;}
+}
+
 async function loadPaidResources(action){
  const status=document.getElementById('paid-access-status');
  const container=document.getElementById('paid-access-results');
