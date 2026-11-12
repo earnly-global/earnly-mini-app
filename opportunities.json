@@ -13,7 +13,12 @@
     "verified": false,
     "source": "Remotive",
     "verification_status": "not_independently_verified",
-    "opportunity_type": "remote_job"
+    "opportunity_type": "remote_job",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Software Engineer Infrastructure",
@@ -29,7 +34,12 @@
     "verified": false,
     "source": "Remote OK",
     "verification_status": "not_independently_verified",
-    "opportunity_type": "remote_job"
+    "opportunity_type": "remote_job",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Clinical Data Manager",
@@ -45,7 +55,12 @@
     "verified": false,
     "source": "Remote OK",
     "verification_status": "not_independently_verified",
-    "opportunity_type": "remote_job"
+    "opportunity_type": "remote_job",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "AI Trainer",
@@ -61,7 +76,12 @@
     "verified": false,
     "source": "Remote OK",
     "verification_status": "not_independently_verified",
-    "opportunity_type": "remote_job"
+    "opportunity_type": "remote_job",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "People Operations Coordinator",
@@ -77,7 +97,12 @@
     "verified": false,
     "source": "Remote OK",
     "verification_status": "not_independently_verified",
-    "opportunity_type": "remote_job"
+    "opportunity_type": "remote_job",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Lead Product Designer",
@@ -93,7 +118,12 @@
     "verified": false,
     "source": "Remote OK",
     "verification_status": "not_independently_verified",
-    "opportunity_type": "remote_job"
+    "opportunity_type": "remote_job",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "QA Tester Entry Level",
@@ -109,7 +139,12 @@
     "verified": false,
     "source": "Remote OK",
     "verification_status": "not_independently_verified",
-    "opportunity_type": "remote_job"
+    "opportunity_type": "remote_job",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Brand Protection & Marketplace Compliance Analyst",
@@ -125,7 +160,12 @@
     "verified": false,
     "source": "Remote OK",
     "verification_status": "not_independently_verified",
-    "opportunity_type": "remote_job"
+    "opportunity_type": "remote_job",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Prolific",
@@ -143,7 +183,12 @@
     "verification_status": "platform_catalog_not_live_offer",
     "opportunity_type": "earning_platform",
     "page_check_status": "reachable",
-    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
+    "page_checked_at": "2026-11-12T08:56:36.259734+00:00",
+    "quality_type": "earning_platform",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Landing page responded; individual tasks and payouts not verified"
   },
   {
     "name": "CloudResearch Connect",
@@ -161,7 +206,12 @@
     "verification_status": "platform_catalog_not_live_offer",
     "opportunity_type": "earning_platform",
     "page_check_status": "reachable",
-    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
+    "page_checked_at": "2026-11-12T08:56:36.259734+00:00",
+    "quality_type": "earning_platform",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Landing page responded; individual tasks and payouts not verified"
   },
   {
     "name": "Freecash",
@@ -179,7 +229,12 @@
     "verification_status": "platform_catalog_not_live_offer",
     "opportunity_type": "earning_platform",
     "page_check_status": "reachable",
-    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
+    "page_checked_at": "2026-11-12T08:56:36.259734+00:00",
+    "quality_type": "earning_platform",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Landing page responded; individual tasks and payouts not verified"
   },
   {
     "name": "Swagbucks",
@@ -197,7 +252,12 @@
     "verification_status": "platform_catalog_not_live_offer",
     "opportunity_type": "earning_platform",
     "page_check_status": "reachable",
-    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
+    "page_checked_at": "2026-11-12T08:56:36.259734+00:00",
+    "quality_type": "earning_platform",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Landing page responded; individual tasks and payouts not verified"
   },
   {
     "name": "PlaytestCloud",
@@ -215,7 +275,12 @@
     "verification_status": "platform_catalog_not_live_offer",
     "opportunity_type": "earning_platform",
     "page_check_status": "reachable",
-    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
+    "page_checked_at": "2026-11-12T08:56:36.259734+00:00",
+    "quality_type": "earning_platform",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Landing page responded; individual tasks and payouts not verified"
   },
   {
     "name": "UserTesting",
@@ -233,7 +298,12 @@
     "verification_status": "platform_catalog_not_live_offer",
     "opportunity_type": "earning_platform",
     "page_check_status": "reachable",
-    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
+    "page_checked_at": "2026-11-12T08:56:36.259734+00:00",
+    "quality_type": "earning_platform",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Landing page responded; individual tasks and payouts not verified"
   },
   {
     "name": "User Interviews",
@@ -251,7 +321,12 @@
     "verification_status": "platform_catalog_not_live_offer",
     "opportunity_type": "earning_platform",
     "page_check_status": "reachable",
-    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
+    "page_checked_at": "2026-11-12T08:56:36.259734+00:00",
+    "quality_type": "earning_platform",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Landing page responded; individual tasks and payouts not verified"
   },
   {
     "name": "Respondent",
@@ -269,7 +344,12 @@
     "verification_status": "platform_catalog_not_live_offer",
     "opportunity_type": "earning_platform",
     "page_check_status": "reachable",
-    "page_checked_at": "2026-11-12T08:42:01.673594+00:00"
+    "page_checked_at": "2026-11-12T08:56:36.259734+00:00",
+    "quality_type": "earning_platform",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Landing page responded; individual tasks and payouts not verified"
   },
   {
     "name": "Senior React Full-stack Developer",
@@ -288,7 +368,12 @@
     "source_location_text": "LATAM, Europe, USA, Canada, APAC",
     "source_published_at": "2026-11-10T14:25:05",
     "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
-    "verification_status": "discovered_not_independently_verified"
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Inside Sales Contractor",
@@ -307,7 +392,12 @@
     "source_location_text": "Worldwide",
     "source_published_at": "2026-11-08T21:47:58",
     "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
-    "verification_status": "discovered_not_independently_verified"
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Tier III Service Desk Engineer",
@@ -326,7 +416,12 @@
     "source_location_text": "Worldwide",
     "source_published_at": "2026-11-07T01:10:55",
     "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
-    "verification_status": "discovered_not_independently_verified"
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "US Remote Patient Care Advocate (Customer Service)",
@@ -345,7 +440,12 @@
     "source_location_text": "USA",
     "source_published_at": "2026-11-06T08:51:01",
     "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
-    "verification_status": "discovered_not_independently_verified"
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Freelance Writer",
@@ -364,7 +464,12 @@
     "source_location_text": "Worldwide",
     "source_published_at": "2026-11-04T16:53:35",
     "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
-    "verification_status": "discovered_not_independently_verified"
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Content Reviewer - United States",
@@ -383,7 +488,12 @@
     "source_location_text": "USA",
     "source_published_at": "2026-11-04T13:39:06",
     "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
-    "verification_status": "discovered_not_independently_verified"
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Freelance Copywriter",
@@ -402,7 +512,12 @@
     "source_location_text": "Worldwide",
     "source_published_at": "2026-11-02T20:01:00",
     "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
-    "verification_status": "discovered_not_independently_verified"
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Full-Stack Developer",
@@ -421,7 +536,12 @@
     "source_location_text": "Worldwide",
     "source_published_at": "2026-10-29T18:22:41",
     "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
-    "verification_status": "discovered_not_independently_verified"
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Senior Back-end Developer",
@@ -440,7 +560,12 @@
     "source_location_text": "Europe, USA, Canada, Australia, Singapore, Mexico, Saudi Arabia",
     "source_published_at": "2026-10-27T12:56:13",
     "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
-    "verification_status": "discovered_not_independently_verified"
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Head of Engineering",
@@ -459,7 +584,12 @@
     "source_location_text": "Worldwide",
     "source_published_at": "2026-10-26T12:20:09",
     "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
-    "verification_status": "discovered_not_independently_verified"
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Software Engineer, AI Coding Tasks",
@@ -478,7 +608,12 @@
     "source_location_text": "Worldwide",
     "source_published_at": "2026-10-17T16:04:29",
     "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
-    "verification_status": "discovered_not_independently_verified"
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Tech Lead Full-Stack Rails Engineer",
@@ -497,7 +632,12 @@
     "source_location_text": "USA, Canada, USA timezones",
     "source_published_at": "2026-10-14T20:33:44",
     "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
-    "verification_status": "discovered_not_independently_verified"
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   },
   {
     "name": "Remote Office Assistant",
@@ -516,6 +656,11 @@
     "source_location_text": "Worldwide",
     "source_published_at": "2026-10-11T20:17:27",
     "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
-    "verification_status": "discovered_not_independently_verified"
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked"
   }
 ]
