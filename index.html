@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <head>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Earnly 2.0</title>
@@ -34,6 +34,14 @@ input,select{background:#123448;color:white;border:1px solid #396175;border-radi
 nav{position:fixed;bottom:0;left:0;width:100%;background:#102e40;display:flex;justify-content:space-around;padding:12px 5px;border-top:1px solid #245064}
 nav button{background:none;color:#b8cbd4;font-size:13px}
 nav button.selected{color:#33e6a1}
+.member-chip{font-size:12px;font-weight:bold;border:1px solid #396175;border-radius:20px;padding:8px 10px}
+.locked-panel{border:1px dashed #537181;border-radius:12px;padding:15px;margin:12px 0;background:#102e40}
+.locked-panel button{margin-top:8px}
+.filter-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#0c2938;padding:13px;border-radius:12px;margin:8px 0}
+.hidden{display:none!important}
+button:disabled{opacity:.55;cursor:not-allowed}
+@media(max-width:430px){.filter-row{grid-template-columns:1fr}}
 @media(min-width:600px){.grid{grid-template-columns:repeat(4,1fr)}}
 </style>
 </head>
@@ -41,7 +49,7 @@ nav button.selected{color:#33e6a1}
 
 <header>
   <div class="logo">💸 EARNLY</div>
-  <span class="tag">FREE MEMBER</span>
+  <span class="member-chip" id="membership-badge">FREE MEMBER</span>
 </header>
 
 <main>
@@ -96,6 +104,17 @@ nav button.selected{color:#33e6a1}
     <option value="name">Name A–Z</option>
     <option value="verified">Verified first</option>
   </select>
+  <div class="plan" id="advanced-panel">
+    <h3>💎 Premium Discovery Tools</h3>
+    <div id="advanced-lock" class="locked-panel">Premium members can filter by estimated task duration and payout information when providers supply that data. <button class="secondary" onclick="showPage('profile')">View memberships</button></div>
+    <div id="advanced-controls" class="hidden">
+      <div class="filter-row">
+        <div><label for="duration-filter">Estimated duration</label><select id="duration-filter" onchange="renderListings()"><option value="all">Any duration</option><option value="15">15 minutes or less</option><option value="30">30 minutes or less</option><option value="60">60 minutes or less</option></select></div>
+        <div><label for="payout-filter">Payout information</label><select id="payout-filter" onchange="renderListings()"><option value="all">All opportunities</option><option value="listed">Payout listed</option><option value="unknown">Payout not listed</option></select></div>
+      </div>
+      <p class="notice">Estimates come from opportunity listings, not guaranteed earnings.</p>
+    </div>
+  </div>
   <p id="count" class="muted"></p>
   <div id="listings"></div>
 </section>
@@ -110,6 +129,7 @@ nav button.selected{color:#33e6a1}
 <section id="saved" class="page">
   <h2>🔖 Saved Opportunities</h2>
   <p>Bookmark opportunities to revisit them later.</p>
+  <p class="notice" id="saved-limit-note"></p>
   <div id="saved-listings"></div>
 </section>
 
@@ -122,6 +142,8 @@ nav button.selected{color:#33e6a1}
 </div>
 
   <h2>👤 My Earnly</h2>
+  <div class="plan"><h3>Membership status</h3><p id="membership-details">Checking verified membership...</p><button class="secondary" onclick="connectEarnlyAccount()">Refresh membership</button></div>
+  <div class="plan"><h3>👑 VIP Opportunity Planner</h3><div id="vip-lock" class="locked-panel">Available to verified VIP members.</div><div id="vip-tools" class="hidden"><p>Compare listed task estimates and plan your research time. This is not a prediction of income.</p><label for="vip-minutes">Available minutes</label><select id="vip-minutes" onchange="renderVipPlanner()"><option value="30">30 minutes</option><option value="60" selected>60 minutes</option><option value="120">120 minutes</option></select><div id="vip-results"></div></div></div>
   <div class="plan">
     <h3>Free Membership</h3>
     <p>Browse opportunities and save favourites.</p>
@@ -129,7 +151,7 @@ nav button.selected{color:#33e6a1}
   
 <div class="plan">
   <h3>⭐ Premium — 500 Stars / 30 days</h3>
-  <p>Expanded discovery and advanced filters.</p>
+  <p>Advanced filters and unlimited local bookmarks. Filters depend on available provider data.</p>
   <button type="button" disabled>
     Premium — Coming Soon
   </button>
@@ -142,7 +164,7 @@ nav button.selected{color:#33e6a1}
 
 <div class="plan">
   <h3>👑 VIP — 1,000 Stars / 30 days</h3>
-  <p>Personalized alerts and additional tools.</p>
+  <p>Opportunity planning tools; time comparisons depend on verified listing data. Alerts are not yet active.</p>
   <button type="button" disabled>
     VIP — Coming Soon
   </button>
@@ -165,6 +187,36 @@ nav button.selected{color:#33e6a1}
 
 <script>
 let opportunities=[];
+let verifiedTier='free';
+let verifiedExpiry=null;
+const tierRank={free:0,premium:1,vip:2};
+function hasTier(tier){return (tierRank[verifiedTier]||0)>=tierRank[tier]}
+function parseMinutes(value){
+  const text=String(value||'').toLowerCase();
+  const m=text.match(/(\d+(?:\.\d+)?)\s*(minutes?|mins?|hours?|hrs?)/);
+  if(!m)return null;
+  return Math.round(Number(m[1])*(m[2].startsWith('h')?60:1));
+}
+function payoutListed(item){const x=String(item.payout||'').trim().toLowerCase();return !!x&&!['not verified','unverified','unknown','not provided','n/a'].includes(x)}
+function updateMemberUI(){
+  const tier=verifiedTier.toUpperCase();
+  document.getElementById('membership-badge').textContent=tier+' MEMBER';
+  document.getElementById('membership-details').textContent=tier+' membership'+(verifiedExpiry?' · Expires '+new Date(verifiedExpiry).toLocaleDateString():'');
+  document.getElementById('advanced-lock').classList.toggle('hidden',hasTier('premium'));
+  document.getElementById('advanced-controls').classList.toggle('hidden',!hasTier('premium'));
+  document.getElementById('vip-lock').classList.toggle('hidden',hasTier('vip'));
+  document.getElementById('vip-tools').classList.toggle('hidden',!hasTier('vip'));
+  document.getElementById('saved-limit-note').textContent=hasTier('premium')?'Unlimited bookmarks on this device.':'Free: up to 5 bookmarks on this device.';
+  renderListings();renderSaved();renderVipPlanner();
+}
+function renderVipPlanner(){
+  const box=document.getElementById('vip-results');if(!box)return;
+  box.replaceChildren();if(!hasTier('vip'))return;
+  const budget=Number(document.getElementById('vip-minutes').value);
+  const matches=opportunities.map(item=>({item,minutes:parseMinutes(item.estimated_time)})).filter(x=>x.minutes!==null&&x.minutes>0&&x.minutes<=budget).sort((a,b)=>a.minutes-b.minutes).slice(0,6);
+  if(!matches.length){box.textContent='Time estimates are not available for the current listings. The planner will show comparisons when verified durations are added; no earnings estimate is available yet.';return}
+  matches.forEach(({item,minutes})=>{const div=document.createElement('div');div.className='stat';const name=document.createElement('strong');name.textContent=item.name||'Opportunity';const info=document.createElement('p');info.textContent=minutes+' min estimated · '+String(item.payout||'Payout not listed');div.append(name,info);box.appendChild(div)});
+}
 let saved=[];
 try{
   const stored=JSON.parse(localStorage.getItem("earnly_saved")||"[]");
@@ -199,10 +251,10 @@ function categoryMatches(item,filter){
   const text=cat+" "+name;
   const terms={
     surveys:["survey"],
-    gaming:["gaming","game"],
+    gaming:["gaming","game","games"],
     ai:["ai","artificial intelligence"],
-    microtasks:["microtask"],
-    websites:["website","web testing"],
+    microtasks:["microtask","remote job"],
+    websites:["website","web testing","testing","qa tester","playtest"],
     crypto:["crypto","blockchain"]
   };
   return (terms[filter]||[filter]).some(term=>text.includes(term));
@@ -245,6 +297,7 @@ function makeCard(item){
     if(saved.includes(key)){
       saved=saved.filter(x=>x!==key);
     }else{
+      if(!hasTier('premium') && saved.length>=5){alert('Free accounts can save up to 5 opportunities. Remove one or explore Premium.');return;}
       saved.push(key);
     }
     try{localStorage.setItem("earnly_saved",JSON.stringify(saved))}
@@ -463,13 +516,16 @@ async function connectEarnlyAccount() {
       throw new Error(result.error || "Account connection failed");
     }
 
-    if (status) {
-      status.textContent =
-        "Account connected — " +
-        result.membership.tier.toUpperCase() +
-" MEMBER";
-    }
+    const membership=result.membership||{};
+    const tier=String(membership.tier||'free').toLowerCase();
+    const expiry=membership.expires_at||null;
+    const paid=(tier==='premium'||tier==='vip')&&membership.status==='active'&&expiry&&new Date(expiry).getTime()>Date.now();
+    verifiedTier=paid?tier:'free';
+    verifiedExpiry=paid?expiry:null;
+    updateMemberUI();
+    if (status) status.textContent='Account connected — '+verifiedTier.toUpperCase()+' MEMBER';
   } catch (error) {
+    verifiedTier='free';verifiedExpiry=null;updateMemberUI();
     console.error("Earnly account connection:", error);
     if (status) {
       status.textContent = "Connection failed: " + error.message;
@@ -560,6 +616,7 @@ async function testPremiumInvoice() {
 }
 
 initializeTelegram();
+updateMemberUI();
 connectEarnlyAccount();
 </script>
 </body>
