@@ -112,7 +112,11 @@ button:disabled{opacity:.55;cursor:not-allowed}
         <div><label for="duration-filter">Estimated duration</label><select id="duration-filter" onchange="renderListings()"><option value="all">Any duration</option><option value="15">15 minutes or less</option><option value="30">30 minutes or less</option><option value="60">60 minutes or less</option></select></div>
         <div><label for="payout-filter">Payout information</label><select id="payout-filter" onchange="renderListings()"><option value="all">All opportunities</option><option value="listed">Payout listed</option><option value="unknown">Payout not listed</option></select></div>
       </div>
-      <p class="notice">Estimates come from opportunity listings, not guaranteed earnings.</p>
+      <label for="listing-type">Opportunity type</label>
+      <select id="listing-type" onchange="renderListings()"><option value="all">All listing types</option><option value="platform">Survey, reward and testing platforms</option><option value="job">Remote job listings</option></select>
+      <label for="data-filter">Listing completeness</label>
+      <select id="data-filter" onchange="renderListings()"><option value="all">Any data completeness</option><option value="time">Estimated time provided</option><option value="country">Country eligibility specified</option></select>
+      <p class="notice">Filters only use published listing information. Unknown payouts and eligibility are not estimates.</p>
     </div>
   </div>
   <p id="count" class="muted"></p>
@@ -143,7 +147,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 
   <h2>👤 My Earnly</h2>
   <div class="plan"><h3>Membership status</h3><p id="membership-details">Checking verified membership...</p><button class="secondary" onclick="connectEarnlyAccount()">Refresh membership</button></div>
-  <div class="plan"><h3>👑 VIP Opportunity Planner</h3><div id="vip-lock" class="locked-panel">Available to verified VIP members.</div><div id="vip-tools" class="hidden"><p>Compare listed task estimates and plan your research time. This is not a prediction of income.</p><label for="vip-minutes">Available minutes</label><select id="vip-minutes" onchange="renderVipPlanner()"><option value="30">30 minutes</option><option value="60" selected>60 minutes</option><option value="120">120 minutes</option></select><div id="vip-results"></div></div></div>
+  <div class="plan"><h3>👑 VIP Opportunity Planner</h3><div id="vip-lock" class="locked-panel">Available to verified VIP members.</div><div id="vip-tools" class="hidden"><p>Compare listed task estimates and plan your research time. This is not a prediction of income.</p><label for="vip-minutes">Available minutes</label><select id="vip-minutes" onchange="renderVipPlanner()"><option value="30">30 minutes</option><option value="60" selected>60 minutes</option><option value="120">120 minutes</option></select><div id="vip-results"></div><h4>Research shortlist</h4><p class="notice">Choose platforms to investigate. Availability, payout and eligibility must be checked on provider websites.</p><div id="vip-shortlist"></div><button class="secondary" onclick="copyVipShortlist()">Copy shortlist</button></div></div>
   <div class="plan">
     <h3>Free Membership</h3>
     <p>Browse opportunities and save favourites.</p>
@@ -207,7 +211,7 @@ function updateMemberUI(){
   document.getElementById('vip-lock').classList.toggle('hidden',hasTier('vip'));
   document.getElementById('vip-tools').classList.toggle('hidden',!hasTier('vip'));
   document.getElementById('saved-limit-note').textContent=hasTier('premium')?'Unlimited bookmarks on this device.':'Free: up to 5 bookmarks on this device.';
-  renderListings();renderSaved();renderVipPlanner();
+  renderListings();renderSaved();renderVipPlanner();renderVipShortlist();
 }
 function renderVipPlanner(){
   const box=document.getElementById('vip-results');if(!box)return;
@@ -216,6 +220,28 @@ function renderVipPlanner(){
   const matches=opportunities.map(item=>({item,minutes:parseMinutes(item.estimated_time)})).filter(x=>x.minutes!==null&&x.minutes>0&&x.minutes<=budget).sort((a,b)=>a.minutes-b.minutes).slice(0,6);
   if(!matches.length){box.textContent='Time estimates are not available for the current listings. The planner will show comparisons when verified durations are added; no earnings estimate is available yet.';return}
   matches.forEach(({item,minutes})=>{const div=document.createElement('div');div.className='stat';const name=document.createElement('strong');name.textContent=item.name||'Opportunity';const info=document.createElement('p');info.textContent=minutes+' min estimated · '+String(item.payout||'Payout not listed');div.append(name,info);box.appendChild(div)});
+}
+function isJobListing(item){return /remoteok|remotive/i.test(String(item.source||'')) || /remote-jobs/i.test(String(item.url||''))}
+function isCountryKnown(item){return Array.isArray(item.countries)&&item.countries.some(c=>!['not verified','unknown',''].includes(String(c).toLowerCase().trim()))}
+function renderVipShortlist(){
+ const box=document.getElementById('vip-shortlist');if(!box)return;
+ box.replaceChildren();if(!hasTier('vip'))return;
+ const choices=opportunities.filter(x=>!isJobListing(x)).slice(0,8);
+ if(!choices.length){box.textContent='No platform listings available.';return}
+ choices.forEach(item=>{
+   const div=document.createElement('div');div.className='stat';
+   const title=document.createElement('strong');title.textContent=item.name||'Platform';
+   const info=document.createElement('p');info.className='notice';info.textContent='Eligibility: '+(isCountryKnown(item)?item.countries.join(', '):'Not verified')+' · Payout: '+(payoutListed(item)?item.payout:'Unverified');
+   const link=document.createElement('a');link.textContent='Review provider';link.style.color='#33e6a1';
+   if(/^https:\/\//i.test(String(item.url||''))){link.href=item.url;link.target='_blank';link.rel='noopener noreferrer'}
+   div.append(title,info,link);box.appendChild(div);
+ });
+}
+function copyVipShortlist(){
+ if(!hasTier('vip'))return;
+ const items=opportunities.filter(x=>!isJobListing(x)).slice(0,8);
+ const output='Earnly research shortlist (not verified offers)\n'+items.map(x=>(x.name||'Platform')+' — '+(x.url||'')).join('\n');
+ if(navigator.clipboard?.writeText){navigator.clipboard.writeText(output).then(()=>alert('Shortlist copied.')).catch(()=>prompt('Copy shortlist:',output))}else prompt('Copy shortlist:',output);
 }
 let saved=[];
 try{
@@ -236,6 +262,7 @@ target.classList.add("active");
   });
   if(page==="explore")renderListings();
   if(page==="saved")renderSaved();
+  if(page==="profile" && window.Telegram?.WebApp?.initData)connectEarnlyAccount();
   window.scrollTo(0,0);
 }
 
@@ -341,6 +368,8 @@ function renderListings(){
   const search=document.getElementById("search").value.toLowerCase();
   const category=document.getElementById("category").value;
   const sort=document.getElementById("sort").value;
+  const listingType=document.getElementById('listing-type').value;
+  const dataFilter=document.getElementById('data-filter').value;
 
   
 const country = document.getElementById("country").value;
@@ -367,7 +396,9 @@ let results = opportunities.filter(item => {
       : countries.includes(selected) ||
         countries.includes("worldwide"));
 
-  return matchesCategory && matchesSearch && matchesCountry;
+  const matchesType=!hasTier('premium')||listingType==='all'||(listingType==='job' ? isJobListing(item) : !isJobListing(item));
+  const matchesData=!hasTier('premium')||dataFilter==='all'||(dataFilter==='time'?parseMinutes(item.estimated_time)!==null:isCountryKnown(item));
+  return matchesCategory && matchesSearch && matchesCountry && matchesType && matchesData;
 });
 
 
@@ -419,6 +450,7 @@ fetch("opportunities.json")
     renderListings();
     renderSaved();
     renderFeatured();
+    renderVipShortlist();
   })
   .catch(()=>{
     document.getElementById("listings").textContent=
