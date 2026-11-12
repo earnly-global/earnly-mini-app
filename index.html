@@ -4,7 +4,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Earnly 2.0</title>
+<title>Earnly V4</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#071c29;color:#fff;font-family:Arial,sans-serif}
@@ -160,6 +160,8 @@ button:disabled{opacity:.55;cursor:not-allowed}
 
   <h2>👤 My Earnly</h2>
   <div class="plan"><h3>Membership status</h3><p id="membership-details">Checking verified membership...</p><button class="secondary" onclick="connectEarnlyAccount()">Refresh membership</button></div>
+  <div class="plan"><h3>🔐 Subscription management</h3><p id="subscription-details">Open Earnly in Telegram to check your subscription.</p><button class="secondary" onclick="loadMemberPortal()">Refresh subscription details</button><p class="notice">Renewal and cancellation information is read-only here. Manage subscriptions in Telegram Settings → Telegram Stars → Subscriptions (menu labels may vary). For help, contact @EarnlyGlobalBot.</p></div>
+  <div class="plan"><h3>🔔 Alert preferences (preview)</h3><p class="notice">Save your interests for future alerts. Automated notifications are not enabled yet.</p><label for="alert-country">Preferred country</label><select id="alert-country"><option value="all">All / not specified</option><option value="Canada">Canada</option><option value="United States">United States</option><option value="United Kingdom">United Kingdom</option><option value="India">India</option></select><label for="alert-category">Preferred category</label><select id="alert-category"><option value="all">All categories</option><option value="surveys">Surveys</option><option value="gaming">Gaming</option><option value="ai">AI tasks</option><option value="websites">Testing</option></select><button class="secondary" onclick="saveMemberPreferences()">Save preferences</button><p id="preferences-status" class="notice"></p></div>
   <div class="plan"><h3>👑 VIP Opportunity Planner</h3><div id="vip-lock" class="locked-panel">Available to verified VIP members.</div><div id="vip-tools" class="hidden"><p>Compare listed task estimates and plan your research time. This is not a prediction of income.</p><label for="vip-minutes">Available minutes</label><select id="vip-minutes" onchange="renderVipPlanner()"><option value="30">30 minutes</option><option value="60" selected>60 minutes</option><option value="120">120 minutes</option></select><div id="vip-results"></div><h4>Research shortlist</h4><p class="notice">Choose platforms to investigate. Availability, payout and eligibility must be checked on provider websites.</p><div id="vip-shortlist"></div><button class="secondary" onclick="copyVipShortlist()">Copy shortlist</button></div></div>
   <div class="plan">
     <h3>Free Membership</h3>
@@ -613,6 +615,7 @@ async function connectEarnlyAccount() {
     verifiedExpiry=paid?expiry:null;
     updateMemberUI();
     if (status) status.textContent='Account connected — '+verifiedTier.toUpperCase()+' MEMBER';
+    loadMemberPortal();
   } catch (error) {
     verifiedTier='free';verifiedExpiry=null;updateMemberUI();
     console.error("Earnly account connection:", error);
