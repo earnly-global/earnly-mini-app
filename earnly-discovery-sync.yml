@@ -1,0 +1,23 @@
+name: Earnly Discovery Sync
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '35 */6 * * *'
+permissions:
+  contents: read
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate catalog (dry run)
+        run: python scripts/sync_discovery.py opportunities.json
+      - name: Sync private Supabase catalog
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/sync_discovery.py opportunities.json --apply
