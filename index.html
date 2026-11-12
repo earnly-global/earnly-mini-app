@@ -130,6 +130,19 @@ button:disabled{opacity:.55;cursor:not-allowed}
   <div id="details-content"></div>
 </section>
 
+
+<section id="quality" class="page">
+  <h2>📊 Opportunity Quality Dashboard</h2>
+  <p>See what the catalog actually contains. Website availability is not proof of a paid task, payout, or eligibility.</p>
+  <div class="grid" id="quality-stats"></div>
+  <div class="plan"><h3>Catalog transparency</h3><div id="quality-summary"></div><p class="notice" id="quality-updated">Checking catalog report…</p></div>
+  <div class="plan"><h3>Review listings</h3>
+    <label for="quality-filter">Show listing type</label>
+    <select id="quality-filter" onchange="renderQuality()"><option value="all">All listings</option><option value="platform">Platform sign-up pages</option><option value="job">Remote jobs</option><option value="task">Individual tasks/studies</option><option value="needs_review">Needs review</option></select>
+    <div id="quality-list"></div>
+  </div>
+</section>
+
 <section id="saved" class="page">
   <h2>🔖 Saved Opportunities</h2>
   <p>Bookmark opportunities to revisit them later.</p>
@@ -185,6 +198,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 <nav>
   <button data-page="home" onclick="showPage('home')">🏠 Home</button>
   <button data-page="explore" onclick="showPage('explore')">🧭 Explore</button>
+  <button data-page="quality" onclick="showPage('quality')">📊 Quality</button>
   <button data-page="saved" onclick="showPage('saved')">🔖 Saved</button>
   <button data-page="profile" onclick="showPage('profile')">👤 Profile</button>
 </nav>
@@ -202,6 +216,48 @@ function parseMinutes(value){
   return Math.round(Number(m[1])*(m[2].startsWith('h')?60:1));
 }
 function payoutListed(item){const x=String(item.payout||'').trim().toLowerCase();return !!x&&!['not verified','unverified','unknown','not provided','n/a'].includes(x)}
+
+function qualityType(item){
+  if(item.opportunity_type==='remote_job'||isJobListing(item))return 'job';
+  if(item.opportunity_type==='individual_task'||item.opportunity_type==='individual_study')return 'task';
+  return 'platform';
+}
+function needsReview(item){
+  return item.page_check_status==='not_found'||item.verification_status==='platform_page_not_found_review_needed'||!item.url;
+}
+function qualityCard(label,value){
+  const el=document.createElement('div');el.className='plan';el.style.margin='4px 0';
+  const n=document.createElement('h3');n.textContent=String(value);
+  const l=document.createElement('p');l.textContent=label;el.append(n,l);return el;
+}
+function renderQuality(){
+  const stats=document.getElementById('quality-stats');if(!stats)return;
+  const counts={platform:0,job:0,task:0,review:0,payout:0,time:0,country:0};
+  opportunities.forEach(item=>{counts[qualityType(item)]++;if(needsReview(item))counts.review++;
+    if(payoutListed(item))counts.payout++;
+    if(parseMinutes(item.estimated_time)!==null)counts.time++;
+    if(isCountryKnown(item))counts.country++;
+  });
+  stats.replaceChildren(qualityCard('Total listings',opportunities.length),qualityCard('Platform pages',counts.platform),qualityCard('Remote jobs',counts.job),qualityCard('Individual tasks/studies',counts.task),qualityCard('Payouts listed (not verified)',counts.payout),qualityCard('Needs page review',counts.review));
+  const summary=document.getElementById('quality-summary');summary.replaceChildren();
+  const info=document.createElement('p');info.textContent=`${counts.time} listings have estimated duration; ${counts.country} have country information. An unknown country does not mean worldwide eligibility.`;summary.append(info);
+  const filter=document.getElementById('quality-filter').value;
+  const items=opportunities.filter(item=>filter==='all'||(filter==='needs_review'?needsReview(item):qualityType(item)===filter));
+  const list=document.getElementById('quality-list');list.replaceChildren();
+  if(!items.length){const p=document.createElement('p');p.textContent='No matching listings.';list.append(p);}
+  items.slice(0,60).forEach(item=>{
+    const box=document.createElement('div');box.className='item';
+    const title=document.createElement('h3');title.textContent=item.name||'Untitled';
+    const type=document.createElement('p');type.className='tag';type.textContent=qualityType(item)==='job'?'Remote job':qualityType(item)==='task'?'Individual task/study':'Platform sign-up page';
+    const status=document.createElement('p');status.className='notice';status.textContent='Payout: '+(payoutListed(item)?String(item.payout)+' (not independently verified)':'Not verified')+' · Page check: '+(item.page_check_status||'Not checked')+' · Eligibility: '+(isCountryKnown(item)?item.countries.join(', '):'Not verified');
+    box.append(title,type,status);list.append(box);
+  });
+}
+fetch('opportunities-report.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('No report');return r.json()}).then(data=>{
+  const el=document.getElementById('quality-updated');
+  el.textContent='Last automated run: '+(data.run_at||'Unknown')+' · Source: '+(data.source_ok?'available':'unavailable/unchecked')+' · New jobs: '+(data.new_jobs??'unknown')+' · Archived: '+(data.archived_jobs??'unknown');
+}).catch(()=>{document.getElementById('quality-updated').textContent='Automation report unavailable; displaying current catalog only.'});
+
 function updateMemberUI(){
   const tier=verifiedTier.toUpperCase();
   document.getElementById('membership-badge').textContent=tier+' MEMBER';
@@ -261,6 +317,7 @@ target.classList.add("active");
     btn.classList.toggle("selected",btn.dataset.page===page);
   });
   if(page==="explore")renderListings();
+  if(page==="quality")renderQuality();
   if(page==="saved")renderSaved();
   if(page==="profile" && window.Telegram?.WebApp?.initData)connectEarnlyAccount();
   window.scrollTo(0,0);
