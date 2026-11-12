@@ -1,40 +1,32 @@
-
 name: Update Earnly opportunities
-
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "0 */6 * * *"
-
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
 permissions:
   contents: write
-
 concurrency:
-  group: earnly-opportunity-update
+  group: earnly-opportunity-updates
   cancel-in-progress: false
-
 jobs:
   update:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 10
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-
-      - name: Update opportunity catalog
+          python-version: '3.12'
+      - name: Discover and assess opportunities
         run: python scripts/update_opportunities.py
-
-      - name: Commit updated catalog
+      - name: Commit updated catalog, archive and report
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add opportunities.json opportunities-archive.json opportunities-report.json
           if ! git diff --cached --quiet; then
-            git commit -m "Automated Earnly opportunity update"
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Refresh Earnly opportunity catalog v3'
             git push
+          else
+            echo 'No catalog changes.'
           fi
