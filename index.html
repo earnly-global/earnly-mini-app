@@ -4,7 +4,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Earnly V4</title>
+<title>Earnly V6</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#071c29;color:#fff;font-family:Arial,sans-serif}
@@ -150,6 +150,19 @@ button:disabled{opacity:.55;cursor:not-allowed}
   <div id="saved-listings"></div>
 </section>
 
+
+<section id="discovery" class="page">
+ <h2>✨ Premium Discovery</h2><p>Server-protected discovery and matching. Listings are not guaranteed available or eligible.</p>
+ <div class="plan"><label for="v6-category">Category</label><select id="v6-category"><option value="all">All</option><option value="surveys">Surveys</option><option value="gaming">Gaming</option><option value="ai">AI tasks</option><option value="microtasks">Remote work / microtasks</option><option value="websites">Testing</option><option value="crypto">Crypto</option></select>
+ <label for="v6-kind">Listing type</label><select id="v6-kind"><option value="all">All</option><option value="platform">Platform signup</option><option value="remote_job">Remote job</option><option value="individual_task">Individual task</option></select>
+ <label for="v6-country">Country (exact match or Worldwide)</label><select id="v6-country"><option value="all">All / unknown</option><option value="Canada">Canada</option><option value="United States">United States</option><option value="United Kingdom">United Kingdom</option><option value="India">India</option></select>
+ <label for="v6-search">Search</label><input id="v6-search" maxlength="100" placeholder="Keywords"/>
+ <label for="v6-interests">Matching interest</label><select id="v6-interests"><option value="all">No preference</option><option value="surveys">Surveys</option><option value="gaming">Gaming</option><option value="ai">AI</option><option value="microtasks">Remote work</option><option value="websites">Testing</option></select>
+ <button class="primary" onclick="v6Discover()">Find matches (Premium / VIP)</button><p id="v6-status" class="notice" role="status">Open in Telegram to search.</p></div>
+ <div id="v6-results"></div>
+ <div class="plan"><h3>👑 VIP comparison</h3><p>Choose 2–3 results using their checkboxes, then compare known fields.</p><button class="secondary" onclick="v6Compare()">Compare selected (VIP only)</button><p id="v6-compare-status" class="notice" role="status"></p><div id="v6-comparison"></div></div>
+</section>
+
 <section id="profile" class="page">
 
 <div class="plan" id="telegram-account">
@@ -163,7 +176,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
   <div class="plan"><h3>🔐 Subscription management</h3><p id="subscription-details">Open Earnly in Telegram to check your subscription.</p><button class="secondary" onclick="loadMemberPortal()">Refresh subscription details</button><p class="notice">Renewal and cancellation information is read-only here. Manage subscriptions in Telegram Settings → Telegram Stars → Subscriptions (menu labels may vary). For help, contact @EarnlyGlobalBot.</p></div>
   <div class="plan"><h3>🔔 Alert preferences (preview)</h3><p class="notice">Save your interests for future alerts. Automated notifications are not enabled yet.</p><label for="alert-country">Preferred country</label><select id="alert-country"><option value="all">All / not specified</option><option value="Canada">Canada</option><option value="United States">United States</option><option value="United Kingdom">United Kingdom</option><option value="India">India</option></select><label for="alert-category">Preferred category</label><select id="alert-category"><option value="all">All categories</option><option value="surveys">Surveys</option><option value="gaming">Gaming</option><option value="ai">AI tasks</option><option value="websites">Testing</option></select><button class="secondary" onclick="saveMemberPreferences()">Save preferences</button><p id="preferences-status" class="notice"></p></div>
   <div class="plan"><h3>🔒 Server-protected member resources</h3><p class="notice">This section checks paid access on Supabase for every request. Public catalog filters and local bookmarks are convenience tools, not confidential paid data.</p><button class="secondary" onclick="loadPaidResources('premium_resources')">Load Premium resources</button> <button class="secondary" onclick="loadPaidResources('vip_resources')">Load VIP-only resources</button><p id="paid-access-status" class="notice">Open in Telegram to verify access.</p><div id="paid-access-results"></div></div>
-  <div class="plan"><h3>👑 VIP Opportunity Planner</h3><div id="vip-lock" class="locked-panel">Available to verified VIP members.</div><div id="vip-tools" class="hidden"><p>Compare listed task estimates and plan your research time. This is not a prediction of income.</p><label for="vip-minutes">Available minutes</label><select id="vip-minutes" onchange="renderVipPlanner()"><option value="30">30 minutes</option><option value="60" selected>60 minutes</option><option value="120">120 minutes</option></select><div id="vip-results"></div><h4>Research shortlist</h4><p class="notice">Choose platforms to investigate. Availability, payout and eligibility must be checked on provider websites.</p><div id="vip-shortlist"></div><button class="secondary" onclick="copyVipShortlist()">Copy shortlist</button></div></div>
+  <div class="plan"><h3>👑 VIP Opportunity Planner (local preview)</h3><div id="vip-lock" class="locked-panel">Available to verified VIP members.</div><div id="vip-tools" class="hidden"><p>Compare listed task estimates and plan your research time. This is not a prediction of income.</p><label for="vip-minutes">Available minutes</label><select id="vip-minutes" onchange="renderVipPlanner()"><option value="30">30 minutes</option><option value="60" selected>60 minutes</option><option value="120">120 minutes</option></select><div id="vip-results"></div><h4>Research shortlist</h4><p class="notice">Choose platforms to investigate. Availability, payout and eligibility must be checked on provider websites.</p><div id="vip-shortlist"></div><button class="secondary" onclick="copyVipShortlist()">Copy shortlist</button></div></div>
   <div class="plan">
     <h3>Free Membership</h3>
     <p>Browse opportunities and save favourites.</p>
@@ -201,6 +214,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 <nav>
   <button data-page="home" onclick="showPage('home')">🏠 Home</button>
   <button data-page="explore" onclick="showPage('explore')">🧭 Explore</button>
+  <button data-page="discovery" onclick="showPage('discovery')">✨ Discover+</button>
   <button data-page="quality" onclick="showPage('quality')">📊 Quality</button>
   <button data-page="saved" onclick="showPage('saved')">🔖 Saved</button>
   <button data-page="profile" onclick="showPage('profile')">👤 Profile</button>
@@ -572,6 +586,57 @@ function openDetails(index) {
 
   container.appendChild(card);
   showPage("details");
+}
+
+
+// V6: backend performs all paid filtering and ranking; UI never trusts its own tier for authorization.
+const V6_URL='https://byywbcwdhtiylexvqokj.supabase.co/functions/v1/earnly-discovery';
+let v6Results=[];
+function v6Options(){
+ const interest=document.getElementById('v6-interests').value;
+ return {category:document.getElementById('v6-category').value,kind:document.getElementById('v6-kind').value,
+ country:document.getElementById('v6-country').value,query:document.getElementById('v6-search').value,
+ interests:interest==='all'?[]:[interest]};
+}
+async function v6Request(action,extra={}){
+ const initData=window.Telegram?.WebApp?.initData;
+ if(!initData)throw new Error('Open Earnly from its Telegram Mini App button.');
+ const response=await fetch(V6_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,initData,...v6Options(),...extra})});
+ let data;try{data=await response.json()}catch{throw new Error('Invalid server response ('+response.status+')');}
+ if(!response.ok)throw new Error(data.error||('Request failed ('+response.status+')'));
+ return data;
+}
+function v6Text(tag,text){const el=document.createElement(tag);el.textContent=String(text??'');return el;}
+async function v6Discover(){
+ const status=document.getElementById('v6-status'),root=document.getElementById('v6-results');
+ status.textContent='Checking membership and finding matches…';root.replaceChildren();v6Results=[];
+ try{
+  const data=await v6Request('discover');v6Results=data.items||[];
+  status.textContent='Access granted · '+data.tier.toUpperCase()+' · '+data.total+' matching listings (up to 40 shown).';
+  if(!v6Results.length){root.appendChild(v6Text('p','No matching catalog entries. Try broader filters.'));return;}
+  for(const item of v6Results){
+   const card=document.createElement('div');card.className='item';
+   const title=v6Text('h3',item.name);card.appendChild(title);
+   card.appendChild(v6Text('p',item.description||'Review the provider website.'));
+   card.appendChild(v6Text('p','Match score: '+item.match_score+' · '+item.listing_kind+' · '+item.category+' · Payout: '+(item.payout||'Unverified')));
+   card.appendChild(v6Text('p','Eligibility/availability must be verified with the provider.'));
+   const label=document.createElement('label');const cb=document.createElement('input');cb.type='checkbox';cb.className='v6-compare';cb.value=String(item.id);cb.style.width='auto';label.append(cb,document.createTextNode(' Select for VIP comparison'));card.appendChild(label);
+   if(/^https:\/\//.test(item.url)){const a=document.createElement('a');a.href=item.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='View provider listing';card.appendChild(a);}
+   root.appendChild(card);
+  }
+ }catch(e){status.textContent=e.message||'Discovery failed.';}
+}
+async function v6Compare(){
+ const status=document.getElementById('v6-compare-status'),root=document.getElementById('v6-comparison');root.replaceChildren();
+ const ids=Array.from(document.querySelectorAll('.v6-compare:checked')).map(x=>Number(x.value));
+ if(ids.length<2||ids.length>3){status.textContent='Select 2 or 3 opportunities.';return;}
+ status.textContent='Checking VIP access…';
+ try{
+  const data=await v6Request('compare',{ids});status.textContent='VIP access verified · '+data.items.length+' opportunities compared.';
+  for(const item of data.items){const card=document.createElement('div');card.className='item';card.appendChild(v6Text('h3',item.name));
+   for(const key of ['category','listing_kind','countries','payout','verified','source','match_score'])card.appendChild(v6Text('p',key.replace('_',' ')+': '+(Array.isArray(item[key])?item[key].join(', '):String(item[key]))));root.appendChild(card);}
+  root.appendChild(v6Text('p',data.disclaimer));
+ }catch(e){status.textContent=e.message||'Comparison failed.';}
 }
 
 showPage("home");
