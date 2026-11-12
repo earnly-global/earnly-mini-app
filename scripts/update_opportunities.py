@@ -1,90 +1,195 @@
 #!/usr/bin/env python3
-"""Conservative Earnly catalog updater. No payout/eligibility verification claims."""
+"""Earnly V2: conservative, auditable public catalog updater (stdlib only)."""
 import datetime as dt
 import json
 import os
 import re
 import sys
+import urllib.error
 import urllib.request
 from pathlib import Path
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / 'opportunities.json'
-NOW = dt.datetime.now(dt.timezone.utc).isoformat()
-API = 'https://remotive.com/api/remote-jobs?limit=100'
-MAX_NEW = 30
+ARCHIVE = ROOT / 'opportunities-archive.json'
+REPORT = ROOT / 'opportunities-report.json'
+NOW = dt.datetime.now(dt.timezone.utc)
+STAMP = NOW.isoformat()
+MAX_NEW = 20
+STALE_DAYS = 45
+USER_AGENT = 'EarnlyCatalog/2.0 (public catalog; source attribution)'
 
-def clean_url(value):
+# These are PLATFORM HOME/REGISTRATION pages, not individual live paid studies.
+# A platform being listed does NOT mean the user has an available task.
+PLATFORMS = [
+ ('Prolific','surveys','https://www.prolific.com/participants','Academic research participation'),
+ ('CloudResearch Connect','surveys','https://connect.cloudresearch.com','Research participation platform'),
+ ('User Interviews','surveys','https://www.userinterviews.com','Research interviews and studies'),
+ ('Respondent','surveys','https://www.respondent.io','Research interview platform'),
+ ('UserTesting','websites','https://www.usertesting.com/get-paid-to-test','Website and app usability testing'),
+ ('PlaytestCloud','gaming','https://players.playtestcloud.com','Game playtesting platform'),
+ ('Freecash','gaming','https://freecash.com','Rewards and game offers platform'),
+ ('Swagbucks','gaming','https://www.swagbucks.com','Rewards and surveys platform'),
+]
+
+def url_key(value):
     if not isinstance(value, str): return ''
     try:
         p = urlsplit(value.strip())
-        if p.scheme not in ('http','https') or not p.netloc: return ''
-        return urlunsplit((p.scheme.lower(),p.netloc.lower(),p.path.rstrip('/') or '/', '', ''))
+        if p.scheme not in ('http','https') or not p.hostname or p.username or p.password: return ''
+        host = p.hostname.lower().removeprefix('www.')
+        path = p.path.rstrip('/') or '/'
+        # Remove tracking parameters, retain meaningful parameters; deterministic ordering.
+        query = urlencode(sorted((k,v) for k,v in parse_qsl(p.query,keep_blank_values=True)
+            if not k.lower().startswith('utm_') and k.lower() not in ('ref','fbclid','gclid')))
+        return urlunsplit(('https',host,path,query,''))
     except ValueError: return ''
 
-def norm_category(cat):
-    return {'games':'gaming','testing':'websites'}.get(str(cat or '').lower(),str(cat or 'general').lower())
+def read_json(path, default):
+    if not path.exists(): return default
+    result = json.loads(path.read_text(encoding='utf-8'))
+    if not isinstance(result,list): raise ValueError(f'{path.name} must be a JSON array')
+    return [x for x in result if isinstance(x,dict)]
 
-def existing():
-    if not CATALOG.exists(): return []
-    data = json.loads(CATALOG.read_text(encoding='utf-8'))
-    if isinstance(data,dict): data=data.get('opportunities',[])
-    if not isinstance(data,list): raise ValueError('Catalog must be an array')
-    return [x for x in data if isinstance(x,dict) and clean_url(x.get('url'))]
+def save_json(path, value):
+    rendered = json.dumps(value,indent=2,ensure_ascii=False,sort_keys=False)+'\n'
+    if not path.exists() or path.read_text(encoding='utf-8') != rendered:
+        path.write_text(rendered,encoding='utf-8')
+        return True
+    return False
 
-def discover_remotive():
-    req = urllib.request.Request(API,headers={'User-Agent':'EarnlyCatalogBot/1.0 (public listing aggregation)','Accept':'application/json'})
-    with urllib.request.urlopen(req,timeout=20) as r:
-        if r.status != 200: raise RuntimeError(f'Remotive returned {r.status}')
-        body = r.read(2_000_000)
-    jobs=json.loads(body).get('jobs',[])
-    if not isinstance(jobs,list): raise ValueError('Unexpected Remotive response')
-    found=[]
-    for job in jobs:
+def fetch_json(url):
+    req = urllib.request.Request(url,headers={'User-Agent':USER_AGENT,'Accept':'application/json'})
+    with urllib.request.urlopen(req,timeout=18) as response:
+        if response.status != 200: raise RuntimeError(f'HTTP {response.status}')
+        return json.loads(response.read(3_000_000))
+
+def probe(url):
+    """Checks whether a landing page responds; NEVER asserts pay, legitimacy or open tasks."""
+    try:
+        req=urllib.request.Request(url,headers={'User-Agent':USER_AGENT,'Range':'bytes=0-0'},method='GET')
+        with urllib.request.urlopen(req,timeout=8) as response:
+            code=response.status
+            return 'reachable' if 200 <= code < 400 else 'unknown'
+    except urllib.error.HTTPError as e:
+        if e.code in (404,410): return 'not_found'
+        return 'unknown'  # 403/429/5xx may be bot protection or transient
+    except Exception:
+        return 'unknown'
+
+def normalize(item):
+    item=dict(item)
+    item['category']={'games':'gaming','testing':'websites'}.get(str(item.get('category','')).lower(),str(item.get('category') or 'general').lower())
+    item['verified']=False if item.get('verification_status') not in ('manually_verified',) else bool(item.get('verified'))
+    item.setdefault('opportunity_type','remote_job' if item.get('source') in ('Remotive','Remote OK') else 'earning_platform')
+    item.setdefault('verification_status','not_independently_verified')
+    return item
+
+def platform_records():
+    records=[]
+    for name,cat,url,description in PLATFORMS:
+        records.append({'name':name,'category':cat,'url':url,'description':description,
+          'opportunity_type':'earning_platform','payout':'Unverified','payment':'Unverified',
+          'countries':['Not verified'],'verified':False,'source':'Official platform website',
+          'verification_status':'platform_catalog_not_live_offer'})
+    return records
+
+def remotive_records():
+    data=fetch_json('https://remotive.com/api/remote-jobs?limit=100')
+    if not isinstance(data,dict) or not isinstance(data.get('jobs'),list): raise ValueError('Unexpected Remotive response')
+    output=[]
+    for job in data['jobs']:
         if not isinstance(job,dict): continue
-        url=clean_url(job.get('url'))
-        name=str(job.get('title') or '').strip()[:180]
-        if not url or not name: continue
-        category_text=(str(job.get('category') or '')+' '+name).lower()
+        url=job.get('url','')
+        if not url_key(url) or not str(job.get('title') or '').strip(): continue
+        title=str(job['title']).strip()[:180]
+        category_text=(str(job.get('category',''))+' '+title).lower()
         cat='ai' if re.search(r'\b(ai|machine learning|annotation|data label)\b',category_text) else 'websites' if re.search(r'\b(qa|testing|tester|usability)\b',category_text) else 'jobs'
-        company=str(job.get('company_name') or 'Not specified')[:140]
-        location=str(job.get('candidate_required_location') or 'Not specified')[:140]
-        found.append({
-            'name':name,'company':company,'category':cat,'opportunity_type':'remote_job',
-            'description':'Remote job listing. Check qualifications, location restrictions, and application status on the provider page.',
-            'url':url,'payout':'Unverified','payment':'Unverified',
-            'countries':['Not verified'],'verified':False,'source':'Remotive',
-            'source_location_text':location,'source_published_at':str(job.get('publication_date') or ''),
-            'last_discovered_at':NOW,'verification_status':'discovered_not_independently_verified'
-        })
-        if len(found)>=MAX_NEW: break
-    return found
+        output.append({'name':title,'company':str(job.get('company_name') or 'Not specified')[:140],
+          'category':cat,'opportunity_type':'remote_job',
+          'description':'Remote employment listing, not a paid survey. Confirm eligibility and whether applications remain open on Remotive.',
+          'url':url,'payout':'Unverified','payment':'Unverified','countries':['Not verified'],
+          'verified':False,'source':'Remotive','source_location_text':str(job.get('candidate_required_location') or 'Not specified')[:140],
+          'source_published_at':str(job.get('publication_date') or ''),
+          'verification_status':'source_listed_not_independently_verified','last_discovered_at':STAMP})
+        if len(output)>=MAX_NEW: break
+    return output
+
+def parse_date(value):
+    if not isinstance(value,str) or not value.strip(): return None
+    try:
+        date=dt.datetime.fromisoformat(value.replace('Z','+00:00'))
+        if date.tzinfo is None: date=date.replace(tzinfo=dt.timezone.utc)
+        return date.astimezone(dt.timezone.utc)
+    except ValueError: return None
 
 def main():
-    catalog=existing()
-    seen={clean_url(x.get('url')) for x in catalog}
-    # Keep the curated catalog and existing listings. Never silently remove entries.
-    for item in catalog:
-        item['category']=norm_category(item.get('category'))
-        item['verified']=bool(item.get('verified',False))
-        item.setdefault('verification_status','not_independently_verified')
-        if 'opportunity_type' not in item:
-            item['opportunity_type']='remote_job' if item.get('source') in ('Remote OK','Remotive') else 'earning_platform'
+    catalog=[normalize(x) for x in read_json(CATALOG,[])]
+    archive=read_json(ARCHIVE,[])
+    archived_keys={url_key(x.get('url')) for x in archive}
+    seen={url_key(x.get('url')) for x in catalog if url_key(x.get('url'))}
+    stats={'run_at':STAMP,'new_platforms':0,'new_jobs':0,'archived_jobs':0,'page_checks':0,'source_ok':False,'source_error':None}
+    for p in platform_records():
+        key=url_key(p['url'])
+        if key not in seen and key not in archived_keys:
+            p['last_discovered_at']=STAMP
+            catalog.append(p); seen.add(key);stats['new_platforms']+=1
+    # Only archive remote jobs if a fresh, successful source snapshot no longer includes them,
+    # AND they are older than 45 days. Never archive due to network failure alone.
+    live_keys=set()
     try:
-        discovered=discover_remotive()
+        jobs=remotive_records()
+        stats['source_ok']=True
+        live_keys={url_key(x['url']) for x in jobs}
+        for job in jobs:
+            key=url_key(job['url'])
+            if key not in seen and key not in archived_keys:
+                catalog.append(job);seen.add(key);stats['new_jobs']+=1
     except Exception as exc:
-        print(f'WARNING: discovery unavailable ({exc}); preserving existing catalog',file=sys.stderr)
-        discovered=[]
-    added=0
-    for item in discovered:
-        key=clean_url(item['url'])
-        if key in seen: continue
-        catalog.append(item);seen.add(key);added+=1
-    # Stable output: only write when new records or normalization actually change data.
-    output=json.dumps(catalog,ensure_ascii=False,indent=2)+'\n'
-    if not CATALOG.exists() or CATALOG.read_text(encoding='utf-8')!=output:
-        CATALOG.write_text(output,encoding='utf-8')
-    print(f'Catalog total={len(catalog)}; newly discovered={added}; timestamp={NOW}')
+        stats['source_error']=str(exc)[:250]
+        print('WARNING: Remotive source unavailable; no source-based archiving',file=sys.stderr)
+    kept=[]
+    for item in catalog:
+        key=url_key(item.get('url'))
+        is_remotive=item.get('source')=='Remotive' and item.get('opportunity_type')=='remote_job'
+        published=parse_date(item.get('source_published_at'))
+        discovered=parse_date(item.get('last_discovered_at'))
+        date=published or discovered
+        aged=date is not None and (NOW-date).days>=STALE_DAYS
+        # Snapshot only contains the first 20 jobs; absence is NOT evidence of expiration.
+        # We archive by age, not by absence, and explicitly label it stale, not closed.
+        if is_remotive and aged:
+            item['archive_reason']='older_than_45_days_unconfirmed_open'
+            item['archived_at']=STAMP
+            if key not in archived_keys:
+                archive.append(item);archived_keys.add(key)
+            stats['archived_jobs']+=1
+        else:
+            kept.append(item)
+    # Probe a bounded number of official platform homepages, never scrape participant dashboards.
+    for item in kept:
+        if item.get('opportunity_type')=='earning_platform' and item.get('name') in {x[0] for x in PLATFORMS}:
+            status=probe(item.get('url',''))
+            item['page_check_status']=status
+            item['page_checked_at']=STAMP
+            stats['page_checks']+=1
+            if status=='not_found':
+                item['verification_status']='platform_page_not_found_review_needed'
+            else:
+                item['verification_status']='platform_catalog_not_live_offer'
+            item['verified']=False
+    # Dedupe existing duplicates, preferring the earliest catalog entry.
+    deduped=[]; keys=set()
+    for item in kept:
+        key=url_key(item.get('url'))
+        if not key or key in keys: continue
+        keys.add(key);deduped.append(item)
+    stats['catalog_total']=len(deduped)
+    stats['archive_total']=len(archive)
+    save_json(CATALOG,deduped)
+    save_json(ARCHIVE,archive)
+    save_json(REPORT,stats)
+    print(json.dumps(stats,indent=2))
 
 if __name__=='__main__': main()
