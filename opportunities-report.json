@@ -1,17 +1,17 @@
 {
-  "run_at": "2026-11-12T13:17:44.148365+00:00",
+  "run_at": "2026-11-12T19:00:04.883493+00:00",
   "new_platforms": 0,
-  "new_jobs": 0,
+  "new_jobs": 1,
   "archived_jobs": 0,
   "page_checks": 8,
   "source_ok": true,
   "source_error": null,
   "quality_counts": {
     "platform_pages": 8,
-    "remote_jobs": 21,
+    "remote_jobs": 22,
     "individual_tasks": 0,
     "needs_page_review": 0
   },
-  "catalog_total": 29,
+  "catalog_total": 30,
   "archive_total": 0
 }
