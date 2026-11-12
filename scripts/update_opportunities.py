@@ -18,7 +18,7 @@ NOW = dt.datetime.now(dt.timezone.utc)
 STAMP = NOW.isoformat()
 MAX_NEW = 20
 STALE_DAYS = 45
-USER_AGENT = 'EarnlyCatalog/2.0 (public catalog; source attribution)'
+USER_AGENT = 'EarnlyCatalog/3.0 (public catalog; source attribution)'
 
 # These are PLATFORM HOME/REGISTRATION pages, not individual live paid studies.
 # A platform being listed does NOT mean the user has an available task.
@@ -84,6 +84,20 @@ def normalize(item):
     item['verified']=False if item.get('verification_status') not in ('manually_verified',) else bool(item.get('verified'))
     item.setdefault('opportunity_type','remote_job' if item.get('source') in ('Remotive','Remote OK') else 'earning_platform')
     item.setdefault('verification_status','not_independently_verified')
+    return item
+
+def quality_fields(item):
+    """Conservative metadata; never infer a payout, task duration or eligibility."""
+    item['quality_type'] = item.get('opportunity_type', 'earning_platform')
+    item['payout_evidence'] = 'not_verified'
+    item['eligibility_evidence'] = 'not_verified'
+    item['task_availability'] = 'not_verified'
+    if item.get('page_check_status') == 'reachable':
+        item['website_check_note'] = 'Landing page responded; individual tasks and payouts not verified'
+    elif item.get('page_check_status') == 'not_found':
+        item['website_check_note'] = 'Landing page returned HTTP 404/410; manual review required'
+    else:
+        item['website_check_note'] = 'Website availability unknown or not checked'
     return item
 
 def platform_records():
@@ -185,6 +199,8 @@ def main():
         key=url_key(item.get('url'))
         if not key or key in keys: continue
         keys.add(key);deduped.append(item)
+    deduped=[quality_fields(item) for item in deduped]
+    stats['quality_counts']={'platform_pages':sum(x.get('opportunity_type')=='earning_platform' for x in deduped),'remote_jobs':sum(x.get('opportunity_type')=='remote_job' for x in deduped),'individual_tasks':sum(x.get('opportunity_type') in ('individual_task','individual_study') for x in deduped),'needs_page_review':sum(x.get('page_check_status')=='not_found' for x in deduped)}
     stats['catalog_total']=len(deduped)
     stats['archive_total']=len(archive)
     save_json(CATALOG,deduped)
