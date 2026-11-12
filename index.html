@@ -162,6 +162,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
   <div class="plan"><h3>Membership status</h3><p id="membership-details">Checking verified membership...</p><button class="secondary" onclick="connectEarnlyAccount()">Refresh membership</button></div>
   <div class="plan"><h3>🔐 Subscription management</h3><p id="subscription-details">Open Earnly in Telegram to check your subscription.</p><button class="secondary" onclick="loadMemberPortal()">Refresh subscription details</button><p class="notice">Renewal and cancellation information is read-only here. Manage subscriptions in Telegram Settings → Telegram Stars → Subscriptions (menu labels may vary). For help, contact @EarnlyGlobalBot.</p></div>
   <div class="plan"><h3>🔔 Alert preferences (preview)</h3><p class="notice">Save your interests for future alerts. Automated notifications are not enabled yet.</p><label for="alert-country">Preferred country</label><select id="alert-country"><option value="all">All / not specified</option><option value="Canada">Canada</option><option value="United States">United States</option><option value="United Kingdom">United Kingdom</option><option value="India">India</option></select><label for="alert-category">Preferred category</label><select id="alert-category"><option value="all">All categories</option><option value="surveys">Surveys</option><option value="gaming">Gaming</option><option value="ai">AI tasks</option><option value="websites">Testing</option></select><button class="secondary" onclick="saveMemberPreferences()">Save preferences</button><p id="preferences-status" class="notice"></p></div>
+  <div class="plan"><h3>🔒 Server-protected member resources</h3><p class="notice">This section checks paid access on Supabase for every request. Public catalog filters and local bookmarks are convenience tools, not confidential paid data.</p><button class="secondary" onclick="loadPaidResources('premium_resources')">Load Premium resources</button> <button class="secondary" onclick="loadPaidResources('vip_resources')">Load VIP-only resources</button><p id="paid-access-status" class="notice">Open in Telegram to verify access.</p><div id="paid-access-results"></div></div>
   <div class="plan"><h3>👑 VIP Opportunity Planner</h3><div id="vip-lock" class="locked-panel">Available to verified VIP members.</div><div id="vip-tools" class="hidden"><p>Compare listed task estimates and plan your research time. This is not a prediction of income.</p><label for="vip-minutes">Available minutes</label><select id="vip-minutes" onchange="renderVipPlanner()"><option value="30">30 minutes</option><option value="60" selected>60 minutes</option><option value="120">120 minutes</option></select><div id="vip-results"></div><h4>Research shortlist</h4><p class="notice">Choose platforms to investigate. Availability, payout and eligibility must be checked on provider websites.</p><div id="vip-shortlist"></div><button class="secondary" onclick="copyVipShortlist()">Copy shortlist</button></div></div>
   <div class="plan">
     <h3>Free Membership</h3>
@@ -705,6 +706,33 @@ async function testPremiumInvoice() {
     alert("Invoice test failed: " + error.message);
     console.error("Earnly invoice test:", error);
   }
+}
+
+
+async function loadPaidResources(action){
+ const status=document.getElementById('paid-access-status');
+ const container=document.getElementById('paid-access-results');
+ container.replaceChildren();
+ const initData=window.Telegram?.WebApp?.initData;
+ if(!initData){status.textContent='Open Earnly inside Telegram to verify membership.';return;}
+ status.textContent='Verifying membership with Supabase...';
+ try{
+  const response=await fetch('https://byywbcwdhtiylexvqokj.supabase.co/functions/v1/earnly-paid-access',{
+   method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,initData})
+  });
+  const result=await response.json();
+  if(!response.ok){status.textContent=response.status===403?'Access denied: '+(result.error||'Paid membership required'):'Could not load: '+(result.error||response.status);return;}
+  status.textContent='Access granted · '+String(result.tier).toUpperCase()+' · '+result.resources.length+' curated resources';
+  if(!result.resources.length){container.textContent='No exclusive resources published yet. Membership access is working; new curated resources will appear here after editorial review.';return;}
+  for(const item of result.resources){
+   const card=document.createElement('div');card.className='stat';
+   const title=document.createElement('strong');title.textContent=item.title;
+   const desc=document.createElement('p');desc.textContent=item.description||'Check provider for details.';
+   card.append(title,desc);
+   if(item.url&&/^https:\/\//i.test(item.url)){const a=document.createElement('a');a.href=item.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Visit provider';card.appendChild(a);}
+   container.appendChild(card);
+  }
+ }catch(error){status.textContent='Connection error: '+error.message;}
 }
 
 initializeTelegram();
