@@ -11,7 +11,9 @@
       "Worldwide"
     ],
     "verified": false,
-    "source": "Remotive"
+    "source": "Remotive",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "remote_job"
   },
   {
     "name": "Software Engineer Infrastructure",
@@ -25,7 +27,9 @@
       "Not verified"
     ],
     "verified": false,
-    "source": "Remote OK"
+    "source": "Remote OK",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "remote_job"
   },
   {
     "name": "Clinical Data Manager",
@@ -39,7 +43,9 @@
       "Not verified"
     ],
     "verified": false,
-    "source": "Remote OK"
+    "source": "Remote OK",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "remote_job"
   },
   {
     "name": "AI Trainer",
@@ -53,7 +59,9 @@
       "Not verified"
     ],
     "verified": false,
-    "source": "Remote OK"
+    "source": "Remote OK",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "remote_job"
   },
   {
     "name": "People Operations Coordinator",
@@ -67,7 +75,9 @@
       "Not verified"
     ],
     "verified": false,
-    "source": "Remote OK"
+    "source": "Remote OK",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "remote_job"
   },
   {
     "name": "Lead Product Designer",
@@ -81,12 +91,14 @@
       "Not verified"
     ],
     "verified": false,
-    "source": "Remote OK"
+    "source": "Remote OK",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "remote_job"
   },
   {
     "name": "QA Tester Entry Level",
     "company": "Ace IT Careers",
-    "category": "testing",
+    "category": "websites",
     "description": "Remote job listing; review eligibility.",
     "url": "https://remoteOK.com/remote-jobs/remote-qa-tester-entry-level-ace-it-careers-1136701",
     "payout": "Unverified",
@@ -95,7 +107,9 @@
       "Not verified"
     ],
     "verified": false,
-    "source": "Remote OK"
+    "source": "Remote OK",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "remote_job"
   },
   {
     "name": "Brand Protection & Marketplace Compliance Analyst",
@@ -109,7 +123,9 @@
       "Not verified"
     ],
     "verified": false,
-    "source": "Remote OK"
+    "source": "Remote OK",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "remote_job"
   },
   {
     "name": "Prolific",
@@ -123,7 +139,9 @@
     ],
     "verified": false,
     "source": "Curated platform catalog",
-    "last_catalogued": "2026-11-09T10:50:44.852795+00:00"
+    "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "earning_platform"
   },
   {
     "name": "CloudResearch Connect",
@@ -137,11 +155,13 @@
     ],
     "verified": false,
     "source": "Curated platform catalog",
-    "last_catalogued": "2026-11-09T10:50:44.852795+00:00"
+    "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "earning_platform"
   },
   {
     "name": "Freecash",
-    "category": "games",
+    "category": "gaming",
     "url": "https://freecash.com",
     "description": "Game milestones and reward offers.",
     "payout": "Unverified",
@@ -151,11 +171,13 @@
     ],
     "verified": false,
     "source": "Curated platform catalog",
-    "last_catalogued": "2026-11-09T10:50:44.852795+00:00"
+    "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "earning_platform"
   },
   {
     "name": "Swagbucks",
-    "category": "games",
+    "category": "gaming",
     "url": "https://www.swagbucks.com",
     "description": "Surveys, games and rewards.",
     "payout": "Unverified",
@@ -165,11 +187,13 @@
     ],
     "verified": false,
     "source": "Curated platform catalog",
-    "last_catalogued": "2026-11-09T10:50:44.852795+00:00"
+    "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "earning_platform"
   },
   {
     "name": "PlaytestCloud",
-    "category": "testing",
+    "category": "websites",
     "url": "https://players.playtestcloud.com",
     "description": "Mobile game playtesting.",
     "payout": "Unverified",
@@ -179,7 +203,9 @@
     ],
     "verified": false,
     "source": "Curated platform catalog",
-    "last_catalogued": "2026-11-09T10:50:44.852795+00:00"
+    "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "earning_platform"
   },
   {
     "name": "UserTesting",
@@ -193,7 +219,9 @@
     ],
     "verified": false,
     "source": "Curated platform catalog",
-    "last_catalogued": "2026-11-09T10:50:44.852795+00:00"
+    "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "earning_platform"
   },
   {
     "name": "User Interviews",
@@ -207,7 +235,9 @@
     ],
     "verified": false,
     "source": "Curated platform catalog",
-    "last_catalogued": "2026-11-09T10:50:44.852795+00:00"
+    "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "earning_platform"
   },
   {
     "name": "Respondent",
@@ -221,6 +251,255 @@
     ],
     "verified": false,
     "source": "Curated platform catalog",
-    "last_catalogued": "2026-11-09T10:50:44.852795+00:00"
+    "last_catalogued": "2026-11-09T10:50:44.852795+00:00",
+    "verification_status": "not_independently_verified",
+    "opportunity_type": "earning_platform"
+  },
+  {
+    "name": "Senior React Full-stack Developer",
+    "company": "Lemon.io",
+    "category": "jobs",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/software-development/senior-react-full-stack-developer-2091136",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "LATAM, Europe, USA, Canada, APAC",
+    "source_published_at": "2026-11-10T14:25:05",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified"
+  },
+  {
+    "name": "Inside Sales Contractor",
+    "company": "Credit Wellness, LLC",
+    "category": "jobs",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/sales/inside-sales-contractor-2086540",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "Worldwide",
+    "source_published_at": "2026-11-08T21:47:58",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified"
+  },
+  {
+    "name": "Tier III Service Desk Engineer",
+    "company": "Unio Digital",
+    "category": "jobs",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/information-technology/tier-iii-service-desk-engineer-2091045",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "Worldwide",
+    "source_published_at": "2026-11-07T01:10:55",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified"
+  },
+  {
+    "name": "US Remote Patient Care Advocate (Customer Service)",
+    "company": "VXI Global Solutions",
+    "category": "jobs",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/customer-service/us-remote-patient-care-advocate-customer-service-2091168",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "USA",
+    "source_published_at": "2026-11-06T08:51:01",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified"
+  },
+  {
+    "name": "Freelance Writer",
+    "company": "IAPWE",
+    "category": "jobs",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/writing/freelance-writer-1185979",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "Worldwide",
+    "source_published_at": "2026-11-04T16:53:35",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified"
+  },
+  {
+    "name": "Content Reviewer - United States",
+    "company": "TELUS Digital",
+    "category": "jobs",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/all-others/content-reviewer-united-states-2091166",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "USA",
+    "source_published_at": "2026-11-04T13:39:06",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified"
+  },
+  {
+    "name": "Freelance Copywriter",
+    "company": "Coalition Technologies ",
+    "category": "jobs",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/writing/freelance-copywriter-1749306",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "Worldwide",
+    "source_published_at": "2026-11-02T20:01:00",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified"
+  },
+  {
+    "name": "Full-Stack Developer",
+    "company": "Fluence International, Inc.",
+    "category": "jobs",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/software-development/full-stack-developer-2091165",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "Worldwide",
+    "source_published_at": "2026-10-29T18:22:41",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified"
+  },
+  {
+    "name": "Senior Back-end Developer",
+    "company": "Lemon.io",
+    "category": "jobs",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/software-development/senior-back-end-developer-2091135",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "Europe, USA, Canada, Australia, Singapore, Mexico, Saudi Arabia",
+    "source_published_at": "2026-10-27T12:56:13",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified"
+  },
+  {
+    "name": "Head of Engineering",
+    "company": "Lemon.io",
+    "category": "jobs",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/software-development/head-of-engineering-2091134",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "Worldwide",
+    "source_published_at": "2026-10-26T12:20:09",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified"
+  },
+  {
+    "name": "Software Engineer, AI Coding Tasks",
+    "company": "Askable",
+    "category": "ai",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/software-development/software-engineer-ai-coding-tasks-2091158",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "Worldwide",
+    "source_published_at": "2026-10-17T16:04:29",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified"
+  },
+  {
+    "name": "Tech Lead Full-Stack Rails Engineer",
+    "company": "Mitre Media",
+    "category": "jobs",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/software-development/tech-lead-full-stack-rails-engineer-2069746",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "USA, Canada, USA timezones",
+    "source_published_at": "2026-10-14T20:33:44",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified"
+  },
+  {
+    "name": "Remote Office Assistant",
+    "company": "Coalition Technologies ",
+    "category": "jobs",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/marketing/remote-office-assistant-1680495",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "Worldwide",
+    "source_published_at": "2026-10-11T20:17:27",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified"
   }
 ]
