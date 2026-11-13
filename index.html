@@ -113,7 +113,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
         <div><label for="payout-filter">Payout information</label><select id="payout-filter" onchange="renderListings()"><option value="all">All opportunities</option><option value="listed">Payout listed</option><option value="unknown">Payout not listed</option></select></div>
       </div>
       <label for="listing-type">Opportunity type</label>
-      <select id="listing-type" onchange="renderListings()"><option value="all">All listing types</option><option value="platform">Survey, reward and testing platforms</option><option value="job">Remote job listings</option></select>
+      <select id="listing-type" onchange="renderListings()"><option value="all">All listing types</option><option value="direct">Direct applications and individual tasks</option><option value="job">Remote job listings</option><option value="platform">Platform signup directory</option></select>
       <label for="data-filter">Listing completeness</label>
       <select id="data-filter" onchange="renderListings()"><option value="all">Any data completeness</option><option value="time">Estimated time provided</option><option value="country">Country eligibility specified</option></select>
       <p class="notice">Filters only use published listing information. Unknown payouts and eligibility are not estimates.</p>
@@ -294,7 +294,11 @@ function renderVipPlanner(){
   if(!matches.length){box.textContent='Time estimates are not available for the current listings. The planner will show comparisons when verified durations are added; no earnings estimate is available yet.';return}
   matches.forEach(({item,minutes})=>{const div=document.createElement('div');div.className='stat';const name=document.createElement('strong');name.textContent=item.name||'Opportunity';const info=document.createElement('p');info.textContent=minutes+' min estimated · '+String(item.payout||'Payout not listed');div.append(name,info);box.appendChild(div)});
 }
-function isJobListing(item){return /remoteok|remotive/i.test(String(item.source||'')) || /remote-jobs/i.test(String(item.url||''))}
+function isJobListing(item){return item.opportunity_type==='remote_job' || /remoteok|remotive/i.test(String(item.source||'')) || /remote-jobs/i.test(String(item.url||''))}
+function isPlatformSignup(item){return item.opportunity_type==='earning_platform'}
+function isDirectOpportunity(item){return !isPlatformSignup(item) && ['remote_job','individual_task','individual_study'].includes(item.opportunity_type)}
+function opportunityRank(item){return item.opportunity_type==='individual_task'||item.opportunity_type==='individual_study'?0:item.application_path==='employer_application'?1:isJobListing(item)?2:3}
+
 function isCountryKnown(item){return Array.isArray(item.countries)&&item.countries.some(c=>!['not verified','unknown',''].includes(String(c).toLowerCase().trim()))}
 function renderVipShortlist(){
  const box=document.getElementById('vip-shortlist');if(!box)return;
@@ -381,7 +385,7 @@ function makeCard(item){
   const meta=document.createElement("p");
   meta.className="tag";
   meta.textContent=(item.category||"General")+" • "+
-    (item.verified?"Marked verified":"Unverified");
+    (item.verified?"Marked verified":"Unverified")+" • "+(isPlatformSignup(item)?"Platform signup, not an active task":item.application_path==='employer_application'?"Employer application required":isJobListing(item)?"Job application; check eligibility":"Check availability");
 
   const payout=document.createElement("p");
   payout.className="notice";
@@ -428,7 +432,7 @@ actions.appendChild(detailsButton);
     link.rel="noopener noreferrer";
     link.className="primary";
     link.style.cssText="text-decoration:none;padding:12px;border-radius:10px;flex:1;text-align:center;font-weight:bold";
-    link.textContent="View Opportunity";
+    link.textContent=isPlatformSignup(item)?"Visit Platform (signup)":item.application_path==='employer_application'?"Apply at Employer":"View Opportunity";
 link.style.color="#071c29";
     actions.appendChild(link);
   }
@@ -470,12 +474,13 @@ let results = opportunities.filter(item => {
       : countries.includes(selected) ||
         countries.includes("worldwide"));
 
-  const matchesType=!hasTier('premium')||listingType==='all'||(listingType==='job' ? isJobListing(item) : !isJobListing(item));
+  const matchesType=!hasTier('premium')||listingType==='all'||(listingType==='job' ? isJobListing(item) : listingType==='direct'?isDirectOpportunity(item):isPlatformSignup(item));
   const matchesData=!hasTier('premium')||dataFilter==='all'||(dataFilter==='time'?parseMinutes(item.estimated_time)!==null:isCountryKnown(item));
   return matchesCategory && matchesSearch && matchesCountry && matchesType && matchesData;
 });
 
 
+  if(sort!=="name" && sort!=="verified")results.sort((a,b)=>opportunityRank(a)-opportunityRank(b));
   if(sort==="name")results.sort((a,b)=>
     String(a.name||"").localeCompare(String(b.name||"")));
   if(sort==="verified")results.sort((a,b)=>
@@ -564,7 +569,9 @@ function openDetails(index) {
     ["Payout", item.payout || "Unverified"],
     ["Estimated time", item.estimated_time || "Not provided"],
     ["Requirements", item.requirements || "Check provider"],
-    ["Status", item.verified ? "Marked verified" : "Unverified"]
+    ["Status", item.verified ? "Marked verified" : "Unverified"],
+    ["Access", isPlatformSignup(item) ? "Platform signup; no individual task confirmed" : item.application_path==='employer_application' ? "Employer application; hiring and start date not guaranteed" : "Check current availability with provider"],
+    ["Location restriction", item.source_location_text || "Not independently verified"]
   ];
 
   fields.forEach(([label, value]) => {
