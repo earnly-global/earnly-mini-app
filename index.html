@@ -4,7 +4,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Earnly V6</title>
+<title>Earnly V8 — Verified Opportunities</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#071c29;color:#fff;font-family:Arial,sans-serif}
@@ -54,26 +54,18 @@ button:disabled{opacity:.55;cursor:not-allowed}
 
 <main>
 <section id="home" class="page active">
-  <div class="hero">
-    <h2>Discover your next opportunity</h2>
-    <p>Explore rewards, surveys, gaming, AI tasks and more.</p>
-    <button class="primary" onclick="showPage('explore')">
-      Explore Opportunities
-    </button>
-  </div>
-
-  <h2>Explore Categories</h2>
-  <div class="grid">
-    <button class="category" onclick="openCategory('surveys')"><span>📋</span>Surveys</button>
-    <button class="category" onclick="openCategory('gaming')"><span>🎮</span>Gaming</button>
-    <button class="category" onclick="openCategory('ai')"><span>🤖</span>AI Tasks</button>
-    <button class="category" onclick="openCategory('crypto')"><span>🪙</span>Crypto</button>
-    <button class="category" onclick="openCategory('microtasks')"><span>💼</span>Microtasks</button>
-    <button class="category" onclick="openCategory('websites')"><span>🌐</span>Websites</button>
-  </div>
-
-  <h2>Featured Opportunities</h2>
-  <div id="featured"></div>
+ <div class="feed-top"><div><div class="eyebrow">YOUR OPPORTUNITY NETWORK</div><h2>Good to see you <span class="mint">✦</span></h2><p>Discover genuine ways to work and earn.</p></div><button class="round-action" onclick="showPage('activity')" aria-label="Activity">♧</button></div>
+ <div class="stories" aria-label="Opportunity categories">
+ <button onclick="openCategory('all')"><span>✦</span>For you</button>
+ <button onclick="openCategory('surveys')"><span>▤</span>Surveys</button>
+ <button onclick="openCategory('gaming')"><span>◈</span>Games</button>
+ <button onclick="openCategory('microtasks')"><span>▣</span>Jobs</button>
+ <button onclick="openCategory('crypto')"><span>◇</span>Crypto</button>
+ <button onclick="openCategory('ai')"><span>✳</span>AI tasks</button>
+ </div>
+ <div class="feed-tabs"><button id="feed-for-you" class="active" onclick="setFeedMode('all')">For you</button><button id="feed-saved" onclick="setFeedMode('saved')">Saved</button></div>
+ <div class="feed-intro"><span class="pulse"></span> Reviewed opportunities only <span class="muted">· No earnings guaranteed</span></div>
+ <div id="social-feed" aria-live="polite"><div class="feed-empty">Loading approved opportunities…</div></div>
 </section>
 
 <section id="explore" class="page">
@@ -102,7 +94,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
   <select id="sort" onchange="renderListings()">
     <option value="default">Default order</option>
     <option value="name">Name A–Z</option>
-    <option value="verified">Verified first</option>
+    <option value="verified">Recently verified first</option>
   </select>
   <div class="plan" id="advanced-panel">
     <h3>💎 Premium Discovery Tools</h3>
@@ -163,6 +155,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
  <div class="plan"><h3>👑 VIP comparison</h3><p>Choose 2–3 results using their checkboxes, then compare known fields.</p><button class="secondary" onclick="v6Compare()">Compare selected (VIP only)</button><p id="v6-compare-status" class="notice" role="status"></p><div id="v6-comparison"></div></div>
 </section>
 
+<section id="activity" class="page"><div class="feed-top"><div><div class="eyebrow">YOUR SPACE</div><h2>Activity</h2><p>Your saved opportunities and research progress.</p></div></div><div class="plan"><h3>🔖 Saved opportunities</h3><p id="activity-saved-count">0 saved</p><button class="primary" onclick="showPage('saved')">View saved opportunities</button></div><div class="plan"><h3>💬 Community</h3><p>Public comments, follows and reposts are being developed. They will launch with reporting, moderation and privacy protections.</p><button class="secondary" disabled>Community coming soon</button></div><div class="plan"><h3>🔔 Notifications</h3><p>Real-time alerts are not enabled yet. Set your interests in Profile.</p><button class="secondary" onclick="showPage('profile')">Manage preferences</button></div></section>
 <section id="profile" class="page">
 
 <div class="plan" id="telegram-account">
@@ -189,9 +182,10 @@ button:disabled{opacity:.55;cursor:not-allowed}
     Premium — Coming Soon
   </button>
 
-<button type="button" onclick="testPremiumInvoice()">
-  🧪 Test Premium Invoice
+<button type="button" id="premium-checkout-button" onclick="testPremiumInvoice()">
+  ⭐ Open Premium Checkout — 500 Stars
 </button>
+<p id="checkout-status" class="notice" role="status" aria-live="polite">Controlled payment test only. Opening checkout does not charge you until you confirm in Telegram.</p>
 
 </div>
 
@@ -211,15 +205,16 @@ button:disabled{opacity:.55;cursor:not-allowed}
 </section>
 </main>
 
-<nav>
-  <button data-page="home" onclick="showPage('home')">🏠 Home</button>
-  <button data-page="explore" onclick="showPage('explore')">🧭 Explore</button>
-  <button data-page="discovery" onclick="showPage('discovery')">✨ Discover+</button>
-  <button data-page="quality" onclick="showPage('quality')">📊 Quality</button>
-  <button data-page="saved" onclick="showPage('saved')">🔖 Saved</button>
-  <button data-page="profile" onclick="showPage('profile')">👤 Profile</button>
+<nav aria-label="Main navigation">
+<button type="button" data-page="home" aria-label="Home" title="Home" onclick="showPage('home')"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9"/><path d="M9 21v-7h6v7"/></svg></button>
+<button type="button" data-page="explore" aria-label="Explore" title="Explore" onclick="showPage('explore')"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button>
+<button type="button" data-page="discovery" aria-label="Matches" title="Matches" onclick="showPage('discovery')"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Z"/><path d="m19 18 .6 1.4L21 20l-1.4.6L19 22l-.6-1.4L17 20l1.4-.6L19 18Z"/></svg></button>
+<button type="button" data-page="activity" aria-label="Activity" title="Activity" onclick="showPage('activity')"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>
+<button type="button" data-page="profile" aria-label="Profile" title="Profile" onclick="showPage('profile')"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
 </nav>
 
+<link rel="stylesheet" href="v8/hybrid.css?v=8.0">
+<script src="v8/hybrid.js?v=8.2"></script>
 <script>
 let opportunities=[];
 let verifiedTier='free';
@@ -232,6 +227,27 @@ function parseMinutes(value){
   if(!m)return null;
   return Math.round(Number(m[1])*(m[2].startsWith('h')?60:1));
 }
+// Defense in depth: ONLY records from the approved export may be displayed.
+// Server-side publication and authorization gates are still required.
+function isApprovedOpportunity(item){
+ if(!item || typeof item!=="object")return false;
+ const kinds=["remote_job","individual_task","individual_study","gaming_reward","crypto_bounty"];
+ if(!kinds.includes(item.opportunity_type))return false;
+ if(item.verified!==true || item.verification_status!=="approved_for_publication")return false;
+ if(item.source_status!=="confirmed_active" || item.requirements_verified!==true || item.country_eligibility_verified!==true)return false;
+ if(!String(item.start_requirements||"").trim() || !Array.isArray(item.countries) || !item.countries.length)return false;
+ if(!item.verification_evidence?.requirements_quote || !item.verification_evidence?.requirements_source_url)return false;
+ if(item.requires_deposit!==false || item.requires_seed_phrase!==false)return false;
+ if(item.opportunity_type==="remote_job" && item.remote_status!=="confirmed_remote")return false;
+ if(item.opportunity_type==="remote_job" && !["published","not_disclosed_by_employer"].includes(item.compensation_status))return false;
+ if(item.opportunity_type!=="remote_job" && (!item.payout_terms || !["official_terms_confirmed","independent_payment_confirmed"].includes(item.payout_evidence_status)))return false;
+ const validUrl=u=>{try{const x=new URL(u);return x.protocol==="https:" && !!x.hostname && !x.username && !x.password;}catch{return false;}};
+ if(!validUrl(item.url)||!validUrl(item.source_url))return false;
+ const checked=Date.parse(item.verified_at||"");
+ if(!Number.isFinite(checked) || checked>Date.now()+300000 || Date.now()-checked>7*86400000)return false;
+ return true;
+}
+
 function payoutListed(item){const x=String(item.payout||'').trim().toLowerCase();return !!x&&!['not verified','unverified','unknown','not provided','n/a'].includes(x)}
 
 function qualityType(item){
@@ -256,7 +272,7 @@ function renderQuality(){
     if(isCountryKnown(item))counts.country++;
   });
   stats.replaceChildren(qualityCard('Total listings',opportunities.length),qualityCard('Platform pages',counts.platform),qualityCard('Remote jobs',counts.job),qualityCard('Individual tasks/studies',counts.task),qualityCard('Payouts listed (not verified)',counts.payout),qualityCard('Needs page review',counts.review));
-  const summary=document.getElementById('quality-summary');summary.replaceChildren();
+  const summary=document.getElementById('quality-summary');if(!summary)return;summary.replaceChildren();
   const info=document.createElement('p');info.textContent=`${counts.time} listings have estimated duration; ${counts.country} have country information. An unknown country does not mean worldwide eligibility.`;summary.append(info);
   const filter=document.getElementById('quality-filter').value;
   const items=opportunities.filter(item=>filter==='all'||(filter==='needs_review'?needsReview(item):qualityType(item)===filter));
@@ -290,7 +306,7 @@ function renderVipPlanner(){
   const box=document.getElementById('vip-results');if(!box)return;
   box.replaceChildren();if(!hasTier('vip'))return;
   const budget=Number(document.getElementById('vip-minutes').value);
-  const matches=opportunities.map(item=>({item,minutes:parseMinutes(item.estimated_time)})).filter(x=>x.minutes!==null&&x.minutes>0&&x.minutes<=budget).sort((a,b)=>a.minutes-b.minutes).slice(0,6);
+  const matches=opportunities.filter(isApprovedOpportunity).map(item=>({item,minutes:parseMinutes(item.estimated_time)})).filter(x=>x.minutes!==null&&x.minutes>0&&x.minutes<=budget).sort((a,b)=>a.minutes-b.minutes).slice(0,6);
   if(!matches.length){box.textContent='Time estimates are not available for the current listings. The planner will show comparisons when verified durations are added; no earnings estimate is available yet.';return}
   matches.forEach(({item,minutes})=>{const div=document.createElement('div');div.className='stat';const name=document.createElement('strong');name.textContent=item.name||'Opportunity';const info=document.createElement('p');info.textContent=minutes+' min estimated · '+String(item.payout||'Payout not listed');div.append(name,info);box.appendChild(div)});
 }
@@ -303,7 +319,7 @@ function isCountryKnown(item){return Array.isArray(item.countries)&&item.countri
 function renderVipShortlist(){
  const box=document.getElementById('vip-shortlist');if(!box)return;
  box.replaceChildren();if(!hasTier('vip'))return;
- const choices=opportunities.filter(x=>!isJobListing(x)).slice(0,8);
+ const choices=opportunities.filter(isApprovedOpportunity).filter(x=>!isJobListing(x)).slice(0,8);
  if(!choices.length){box.textContent='No platform listings available.';return}
  choices.forEach(item=>{
    const div=document.createElement('div');div.className='stat';
@@ -316,7 +332,7 @@ function renderVipShortlist(){
 }
 function copyVipShortlist(){
  if(!hasTier('vip'))return;
- const items=opportunities.filter(x=>!isJobListing(x)).slice(0,8);
+ const items=opportunities.filter(isApprovedOpportunity).filter(x=>!isJobListing(x)).slice(0,8);
  const output='Earnly research shortlist (not verified offers)\n'+items.map(x=>(x.name||'Platform')+' — '+(x.url||'')).join('\n');
  if(navigator.clipboard?.writeText){navigator.clipboard.writeText(output).then(()=>alert('Shortlist copied.')).catch(()=>prompt('Copy shortlist:',output))}else prompt('Copy shortlist:',output);
 }
@@ -327,6 +343,7 @@ try{
 }catch(e){saved=[]}
 
 function showPage(page){
+  if(page === "discovery"){alert("Premium Discovery is temporarily paused while we verify its server-side catalog.");return;}
   document.querySelectorAll(".page").forEach(el=>el.classList.remove("active"));
   const target = document.getElementById(page);
 if (!target) {
@@ -340,6 +357,8 @@ target.classList.add("active");
   if(page==="explore")renderListings();
   if(page==="quality")renderQuality();
   if(page==="saved")renderSaved();
+  if(page==="home")renderSocialFeed();
+  if(page==="activity")renderActivity();
   if(page==="profile" && window.Telegram?.WebApp?.initData)connectEarnlyAccount();
   window.scrollTo(0,0);
 }
@@ -370,6 +389,7 @@ function itemKey(item){
 }
 
 function makeCard(item){
+  if(!isApprovedOpportunity(item))return document.createElement("div");
   const card=document.createElement("div");
   card.className="item";
 
@@ -380,16 +400,16 @@ function makeCard(item){
   company.textContent=item.company||"Provider not specified";
 
   const detail=document.createElement("p");
-  detail.textContent=item.description||"Check provider requirements.";
+  detail.textContent=item.description||"Details unavailable.";
 
   const meta=document.createElement("p");
   meta.className="tag";
   meta.textContent=(item.category||"General")+" • "+
-    (item.verified?"Marked verified":"Unverified")+" • "+(isPlatformSignup(item)?"Platform signup, not an active task":item.application_path==='employer_application'?"Employer application required":isJobListing(item)?"Job application; check eligibility":"Check availability");
+    "Verified listing"+" • "+(isPlatformSignup(item)?"Platform signup, not an active task":item.application_path==='employer_application'?"Employer application required":isJobListing(item)?"Job application; check eligibility":"Check availability");
 
   const payout=document.createElement("p");
   payout.className="notice";
-  payout.textContent="Payout: "+String(item.payout||"Not verified");
+  payout.textContent="Compensation: "+String(item.payout||"Not disclosed by employer");
 
   const actions=document.createElement("div");
   actions.className="actions";
@@ -409,7 +429,7 @@ function makeCard(item){
     catch(e){}
     renderListings();
     renderSaved();
-    renderFeatured();
+    renderSocialFeed();
   };
   actions.appendChild(bookmark);
 
@@ -446,13 +466,13 @@ function renderListings(){
   const search=document.getElementById("search").value.toLowerCase();
   const category=document.getElementById("category").value;
   const sort=document.getElementById("sort").value;
-  const listingType=document.getElementById('listing-type').value;
-  const dataFilter=document.getElementById('data-filter').value;
+  const listingType=document.getElementById('listing-type')?.value||'all';
+  const dataFilter=document.getElementById('data-filter')?.value||'all';
 
   
 const country = document.getElementById("country").value;
 
-let results = opportunities.filter(item => {
+let results = opportunities.filter(isApprovedOpportunity).filter(item => {
   const matchesCategory = categoryMatches(item, category);
 
   const matchesSearch =
@@ -491,7 +511,7 @@ let results = opportunities.filter(item => {
 
   if(!results.length){
     const empty=document.createElement("p");
-    empty.textContent="No matching opportunities found.";
+    empty.textContent="No approved opportunities match your filters yet. Try again later.";
     container.appendChild(empty);
     return;
   }
@@ -502,7 +522,7 @@ let results = opportunities.filter(item => {
 function renderSaved(){
   const container=document.getElementById("saved-listings");
   container.replaceChildren();
-  const results=opportunities.filter(item=>saved.includes(itemKey(item)));
+  const results=opportunities.filter(isApprovedOpportunity).filter(item=>saved.includes(itemKey(item)));
   if(!results.length){
     const empty=document.createElement("p");
     empty.textContent="No saved opportunities yet.";
@@ -513,11 +533,12 @@ function renderSaved(){
 
 function renderFeatured(){
   const container=document.getElementById("featured");
+  if(!container)return;
   container.replaceChildren();
   opportunities.slice(0,3).forEach(item=>container.appendChild(makeCard(item)));
 }
 
-fetch("opportunities.json")
+fetch("opportunities-approved.json",{cache:"no-store"})
   .then(response=>{
     if(!response.ok)throw new Error("Cannot load data");
     return response.json();
@@ -525,24 +546,23 @@ fetch("opportunities.json")
   .then(data=>{
     const list=Array.isArray(data)?data:
       Array.isArray(data.opportunities)?data.opportunities:[];
-    opportunities=list.filter(item=>item && typeof item==="object");
+    opportunities=list.filter(isApprovedOpportunity);
     renderListings();
     renderSaved();
-    renderFeatured();
+    renderSocialFeed();
     renderVipShortlist();
   })
   .catch(()=>{
     document.getElementById("listings").textContent=
-      "Unable to load opportunities. Check your local server.";
-    document.getElementById("featured").textContent=
-      "Opportunity data unavailable.";
+      "Verified opportunities are temporarily unavailable. Please try again later.";
+    renderSocialFeed();
   });
 
 
 
 function openDetails(index) {
   const item = opportunities[index];
-  if (!item) {
+  if (!item || !isApprovedOpportunity(item)) {
     alert("Opportunity not found.");
     return;
   }
@@ -568,8 +588,10 @@ function openDetails(index) {
     ["Description", item.description || "Not provided"],
     ["Payout", item.payout || "Unverified"],
     ["Estimated time", item.estimated_time || "Not provided"],
-    ["Requirements", item.requirements || "Check provider"],
-    ["Status", item.verified ? "Marked verified" : "Unverified"],
+    ["Requirements", item.start_requirements],
+    ["Status", "Verified listing"],
+    ["Last reviewed", item.verified_at],
+    ["Evidence source", item.source_url],
     ["Access", isPlatformSignup(item) ? "Platform signup; no individual task confirmed" : item.application_path==='employer_application' ? "Employer application; hiring and start date not guaranteed" : "Check current availability with provider"],
     ["Location restriction", item.source_location_text || "Not independently verified"]
   ];
@@ -606,6 +628,7 @@ function v6Options(){
  interests:interest==='all'?[]:[interest]};
 }
 async function v6Request(action,extra={}){
+ throw new Error("Discovery is paused until server-side verification is enforced.");
  const initData=window.Telegram?.WebApp?.initData;
  if(!initData)throw new Error('Open Earnly from its Telegram Mini App button.');
  const response=await fetch(V6_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,initData,...v6Options(),...extra})});
@@ -730,56 +753,54 @@ function initializeTelegram() {
 
 async function testPremiumInvoice() {
   const tg = window.Telegram?.WebApp;
-
-  if (!tg?.initData) {
-    alert("Open Earnly through Telegram to test checkout.");
+  const statusEl = document.getElementById('checkout-status');
+  const button = document.getElementById('premium-checkout-button');
+  const say = (message) => { if (statusEl) statusEl.textContent = message; };
+  if (!tg?.initData || typeof tg.openInvoice !== 'function') {
+    say('Open Earnly using its button inside Telegram to test checkout.');
     return;
   }
-
+  if (button?.disabled) return;
+  if (button) button.disabled = true;
+  say('Requesting a Premium invoice from Earnly…');
   try {
-    const response = await fetch(
-      "https://byywbcwdhtiylexvqokj.supabase.co/functions/v1/earnly-stars-payments",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          action: "create_invoice",
-          tier: "premium",
-          initData: tg.initData
-        })
-      }
-    );
-
+    const response = await fetch('https://byywbcwdhtiylexvqokj.supabase.co/functions/v1/earnly-stars-payments', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({action:'create_invoice', tier:'premium', initData:tg.initData})
+    });
     const result = await response.json();
-
-    if (!response.ok || !result.invoice_link) {
-      throw new Error(result.error || "Invoice creation failed");
+    if (!response.ok || !result.ok || typeof result.invoice_link !== 'string') {
+      throw new Error(result.error || 'Invoice creation failed');
     }
-
-    if (typeof tg.openInvoice !== "function") {
-      throw new Error("Telegram invoice checkout is unavailable. Open Earnly in the Telegram app.");
+    if (result.tier !== 'premium' || result.stars !== 500) {
+      throw new Error('Unexpected invoice details; checkout stopped.');
     }
-
-    tg.openInvoice(result.invoice_link, (status) => {
-      if (status === "paid") {
-        alert("Telegram reports payment completed. Checking membership status...");
-        connectEarnlyAccount();
-      } else if (status === "cancelled") {
-        alert("Checkout cancelled. No payment was made.");
-      } else if (status === "failed") {
-        alert("Telegram checkout failed. No successful payment was reported.");
+    say('Telegram checkout opening. Confirm only if you intend to spend 500 Stars.');
+    tg.openInvoice(result.invoice_link, async (checkoutStatus) => {
+      if (button) button.disabled = false;
+      if (checkoutStatus === 'paid') {
+        say('Telegram reports payment. Refreshing server-verified membership…');
+        await connectEarnlyAccount();
+        if (verifiedTier === 'premium' || verifiedTier === 'vip') {
+          say('Payment reported and paid membership verified by Earnly.');
+        } else {
+          say('Payment reported, but membership is not yet confirmed. Do not purchase again; contact support if this persists.');
+        }
+      } else if (checkoutStatus === 'cancelled') {
+        say('Checkout cancelled.');
+      } else if (checkoutStatus === 'failed') {
+        say('Telegram reported checkout failure. Check your Stars history before retrying.');
       } else {
-        alert("Telegram checkout status: " + status + ". Check your Stars transaction history before retrying.");
+        say('Telegram checkout status: '+String(checkoutStatus)+'. Check your Stars history before retrying.');
       }
     });
   } catch (error) {
-    alert("Invoice test failed: " + error.message);
-    console.error("Earnly invoice test:", error);
+    if (button) button.disabled = false;
+    say('Unable to open checkout: '+(error?.message || 'Unknown error'));
+    console.error('Earnly checkout:', error);
   }
 }
-
 
 
 // V5 hotfix: restore the V4 membership portal and preferences handlers.
@@ -863,8 +884,8 @@ updateMemberUI();
 connectEarnlyAccount();
 </script>
 
-<link rel="stylesheet" href="v7/launch.css?v=7-rc1">
-<script defer src="v7/launch.js?v=7-rc1"></script>
+
+<!-- Removed missing v7 assets; this package is self-contained. -->
 
 </body>
 </html>
