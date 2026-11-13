@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-11-13T06:05:26.187458+00:00",
+  "run_at": "2026-11-13T07:22:26.094454+00:00",
   "new_platforms": 0,
   "new_jobs": 0,
   "archived_jobs": 0,
   "page_checks": 8,
   "source_ok": true,
   "source_error": null,
-  "direct_jobs_added": 163,
+  "direct_jobs_added": 0,
   "direct_source_errors": [
     "sezzle: Invalid \\uXXXX escape: line 1 column 2993333 (char 2993332)"
   ],
