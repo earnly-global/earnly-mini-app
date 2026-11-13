@@ -1,0 +1,12 @@
+import {readFileSync,existsSync} from 'node:fs';
+import assert from 'node:assert/strict';
+const js=readFileSync('v7/launch.js','utf8');
+assert(js.includes('EarnlyV7'));
+assert(!/service_role|sb_secret_|TELEGRAM_BOT_TOKEN|create_invoice|openInvoice|update\s+memberships/i.test(js));
+assert(existsSync('index.html'),'Run this from repository root after installation');
+const html=readFileSync('index.html','utf8');
+assert(html.includes('v7/launch.js'),'Missing V7 script reference in index.html');
+assert(html.includes('telegram-web-app.js'),'Telegram SDK must remain');
+assert(html.includes('connectEarnlyAccount'),'Existing account connection must remain');
+console.log('PASS: V7 assets, Telegram SDK and existing account integration present.');
+console.log('NOTE: This is static verification, not live Telegram Stars or paid-access testing.');
