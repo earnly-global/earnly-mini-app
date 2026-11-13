@@ -1,0 +1,21 @@
+name: Earnly V7 launch checks
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'index.html'
+      - 'v7/**'
+      - '.github/workflows/earnly-v7-check.yml'
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify V7 installation (read-only)
+        run: node v7/verify.mjs
