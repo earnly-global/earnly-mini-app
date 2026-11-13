@@ -231,7 +231,7 @@ function parseMinutes(value){
 // Server-side publication and authorization gates are still required.
 function isApprovedOpportunity(item){
  if(!item || typeof item!=="object")return false;
- const kinds=["remote_job","individual_task","individual_study","gaming_reward","crypto_bounty"];
+ const kinds=["remote_job","individual_task","individual_study","gaming_reward","crypto_bounty","earning_platform"];
  if(!kinds.includes(item.opportunity_type))return false;
  if(item.verified!==true || item.verification_status!=="approved_for_publication")return false;
  if(item.source_status!=="confirmed_active" || item.requirements_verified!==true || item.country_eligibility_verified!==true)return false;
@@ -242,7 +242,10 @@ function isApprovedOpportunity(item){
  if(item.opportunity_type==="remote_job" && !["published","not_disclosed_by_employer"].includes(item.compensation_status))return false;
  if(item.opportunity_type!=="remote_job" && (!item.payout_terms || !["official_terms_confirmed","independent_payment_confirmed"].includes(item.payout_evidence_status)))return false;
  const validUrl=u=>{try{const x=new URL(u);return x.protocol==="https:" && !!x.hostname && !x.username && !x.password;}catch{return false;}};
- if(!validUrl(item.url)||!validUrl(item.source_url))return false;
+ if(!validUrl(item.url)||!validUrl(item.source_url)||!validUrl(item.verification_evidence?.requirements_source_url))return false;
+  if(item.published!==true || item.review_status!=="approved")return false;
+  const expires=Date.parse(item.verification_expires_at||"");
+  if(!Number.isFinite(expires)||expires<=Date.now())return false;
  const checked=Date.parse(item.verified_at||"");
  if(!Number.isFinite(checked) || checked>Date.now()+300000 || Date.now()-checked>7*86400000)return false;
  return true;
@@ -251,7 +254,8 @@ function isApprovedOpportunity(item){
 function payoutListed(item){const x=String(item.payout||'').trim().toLowerCase();return !!x&&!['not verified','unverified','unknown','not provided','n/a'].includes(x)}
 
 function qualityType(item){
-  if(item.opportunity_type==='remote_job'||isJobListing(item))return 'job';
+  if(item.opportunity_type==='earning_platform')return 'platform';
+   if(item.opportunity_type==='remote_job'||isJobListing(item))return 'job';
   if(item.opportunity_type==='individual_task'||item.opportunity_type==='individual_study')return 'task';
   return 'platform';
 }
@@ -504,7 +508,7 @@ let results = opportunities.filter(isApprovedOpportunity).filter(item => {
   if(sort==="name")results.sort((a,b)=>
     String(a.name||"").localeCompare(String(b.name||"")));
   if(sort==="verified")results.sort((a,b)=>
-    Number(Boolean(b.verified))-Number(Boolean(a.verified)));
+    Date.parse(b.verified_at||0)-Date.parse(a.verified_at||0));
 
   document.getElementById("count").textContent=results.length+" opportunities found";
   container.replaceChildren();
