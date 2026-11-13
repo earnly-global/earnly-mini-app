@@ -8,6 +8,7 @@ import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
+from crypto_hub import reviewed_crypto_records
 from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,6 +18,9 @@ REPORT = ROOT / 'opportunities-report.json'
 NOW = dt.datetime.now(dt.timezone.utc)
 STAMP = NOW.isoformat()
 MAX_NEW = 20
+DIRECT_MAX_PER_BOARD = 40
+DIRECT_BOARD_CONFIG = ROOT / 'direct-job-sources.json'
+DIRECT_TASK_CONFIG = ROOT / 'direct-tasks-reviewed.json'
 STALE_DAYS = 45
 USER_AGENT = 'EarnlyCatalog/3.0 (public catalog; source attribution)'
 
@@ -89,7 +93,7 @@ def normalize(item):
 def quality_fields(item):
     """Conservative metadata; never infer a payout, task duration or eligibility."""
     item['quality_type'] = item.get('opportunity_type', 'earning_platform')
-    item['payout_evidence'] = 'not_verified'
+    item['payout_evidence'] = item.get('payout_evidence_status', 'not_verified')
     item['eligibility_evidence'] = 'not_verified'
     item['task_availability'] = 'not_verified'
     if item.get('page_check_status') == 'reachable':
@@ -130,6 +134,111 @@ def remotive_records():
         if len(output)>=MAX_NEW: break
     return output
 
+def greenhouse_records():
+    """Official Greenhouse public job boards. Configure explicit, reviewed board tokens.
+
+    An open job posting is NOT a promise of employment or immediate work.
+    Do not scrape applications, candidate data, or pages behind authentication.
+    """
+    config=read_json(DIRECT_BOARD_CONFIG, [])
+    records=[]; errors=[]
+    for board in config[:30]:
+        if str(board.get('provider','greenhouse')).lower() != 'greenhouse': continue
+        token=str(board.get('board_token') or '').strip()
+        if not re.fullmatch(r'[a-zA-Z0-9_-]{2,80}',token):
+            errors.append('Invalid board token in direct-job-sources.json'); continue
+        try:
+            data=fetch_json('https://boards-api.greenhouse.io/v1/boards/'+token+'/jobs?content=true')
+            if not isinstance(data,dict) or not isinstance(data.get('jobs'),list):
+                raise ValueError('Unexpected Greenhouse response')
+            for job in data['jobs'][:DIRECT_MAX_PER_BOARD]:
+                url=job.get('absolute_url','')
+                if not url_key(url) or not str(job.get('title') or '').strip(): continue
+                location=str((job.get('location') or {}).get('name') or 'Not specified')[:160]
+                title=str(job['title']).strip()[:180]
+                label=(title+' '+str(job.get('content') or '')[:1000]).lower()
+                category='ai' if re.search(r'\b(ai trainer|machine learning|data annotat|ai evaluation)\b',label) else 'jobs'
+                records.append({'name':title,'company':str(board.get('company') or token)[:140],
+                    'category':category,'opportunity_type':'remote_job',
+                    'description':'Employer-published job posting. Remote eligibility and application status must be confirmed with the employer.',
+                    'url':url,'payout':'Unverified','payment':'Unverified',
+                    'countries':['Not verified'],'verified':False,'source':'Greenhouse employer board',
+                    'source_location_text':location,'source_published_at':str(job.get('updated_at') or ''),
+                    'verification_status':'employer_posted_not_independently_verified',
+                    'application_path':'employer_application','start_speed':'application_required',
+                    'last_discovered_at':STAMP})
+        except Exception as exc:
+            errors.append(token+': '+str(exc)[:120])
+    return records,errors
+
+def lever_records():
+    """Public Lever postings from explicitly configured company slugs.
+
+    Lever postings are employer applications, not immediate paid tasks. Country,
+    device suitability and salary must not be guessed from job descriptions.
+    """
+    records=[]; errors=[]
+    for board in read_json(DIRECT_BOARD_CONFIG, [])[:30]:
+        if str(board.get('provider','greenhouse')).lower() != 'lever': continue
+        slug=str(board.get('site_slug') or '').strip()
+        if not re.fullmatch(r'[a-zA-Z0-9_-]{2,80}',slug):
+            errors.append('Invalid Lever site slug'); continue
+        try:
+            data=fetch_json('https://api.lever.co/v0/postings/'+slug+'?mode=json')
+            if not isinstance(data,list): raise ValueError('Unexpected Lever response')
+            for job in data[:DIRECT_MAX_PER_BOARD]:
+                if not isinstance(job,dict): continue
+                title=str(job.get('text') or '').strip()[:180]
+                url=job.get('hostedUrl') or job.get('applyUrl') or ''
+                if not title or not url_key(url): continue
+                categories=job.get('categories') or {}
+                location=str(categories.get('location') or 'Not specified')[:160]
+                records.append({'name':title,'company':str(board.get('company') or slug)[:140],
+                  'category':'jobs','opportunity_type':'remote_job',
+                  'description':'Employer-published Lever application. Remote status, pay and eligibility require confirmation.',
+                  'url':url,'payout':'Unverified','payment':'Unverified','countries':['Not verified'],
+                  'verified':False,'source':'Lever employer board','source_location_text':location,
+                  'verification_status':'employer_posted_not_independently_verified',
+                  'application_path':'employer_application','start_speed':'application_required',
+                  'last_discovered_at':STAMP})
+        except Exception as exc: errors.append(slug+': '+str(exc)[:120])
+    return records,errors
+
+
+def reviewed_direct_tasks():
+    """Individual, manually researched offers. Reject directories and deposit scams.
+
+    A reviewed source is NOT proof of successful payment or guaranteed availability.
+    """
+    records=[]; rejected=[]
+    for row in read_json(DIRECT_TASK_CONFIG,[]):
+        name=str(row.get('name') or '').strip()
+        url=str(row.get('url') or '').strip()
+        kind=str(row.get('opportunity_type') or '')
+        evidence=str(row.get('source_url') or '').strip()
+        terms=str(row.get('start_requirements') or '').strip()
+        if kind not in ('individual_task','individual_study','gaming_reward','crypto_bounty') or not name or not url_key(url) or not url_key(evidence) or not terms:
+            rejected.append(name or 'unnamed: missing source, link, requirements or valid type'); continue
+        if row.get('requires_deposit') is not False or row.get('requires_seed_phrase') is not False:
+            rejected.append(name+': unsafe or unknown deposit/seed requirements'); continue
+        if row.get('review_status') != 'human_reviewed':
+            rejected.append(name+': human review required'); continue
+        countries=row.get('countries')
+        if not isinstance(countries,list) or not countries:
+            rejected.append(name+': country information required'); continue
+        records.append({'name':name[:180], 'company':str(row.get('company') or '')[:140],
+          'category':str(row.get('category') or 'general')[:80], 'opportunity_type':kind,
+          'description':str(row.get('description') or '')[:1000], 'url':url_key(url),
+          'source':str(row.get('source') or 'Official offer page')[:120],
+          'source_url':url_key(evidence),'start_requirements':terms[:500],
+          'countries':countries[:50], 'device_support':row.get('device_support',[]),
+          'payout':str(row.get('payout') or 'Unverified')[:200],
+          'payout_evidence_status':str(row.get('payout_evidence_status') or 'not_verified'),
+          'verification_status':'human_reviewed_terms_not_payout_verified',
+          'verified':False, 'start_speed':'requirements_apply',
+          'last_discovered_at':STAMP})
+    return records,rejected
+
 def parse_date(value):
     if not isinstance(value,str) or not value.strip(): return None
     try:
@@ -143,7 +252,7 @@ def main():
     archive=read_json(ARCHIVE,[])
     archived_keys={url_key(x.get('url')) for x in archive}
     seen={url_key(x.get('url')) for x in catalog if url_key(x.get('url'))}
-    stats={'run_at':STAMP,'new_platforms':0,'new_jobs':0,'archived_jobs':0,'page_checks':0,'source_ok':False,'source_error':None}
+    stats={'run_at':STAMP,'new_platforms':0,'new_jobs':0,'archived_jobs':0,'page_checks':0,'source_ok':False,'source_error':None,'direct_jobs_added':0,'direct_source_errors':[],'crypto_added':0,'crypto_rejected':[],'lever_added':0,'task_added':0,'task_rejected':[]}
     for p in platform_records():
         key=url_key(p['url'])
         if key not in seen and key not in archived_keys:
@@ -163,6 +272,36 @@ def main():
     except Exception as exc:
         stats['source_error']=str(exc)[:250]
         print('WARNING: Remotive source unavailable; no source-based archiving',file=sys.stderr)
+    # Prefer actual employer applications over generic platform signups.
+    # Only explicitly configured employer boards are fetched.
+    try:
+        direct_jobs,errors=greenhouse_records()
+        stats['direct_source_errors']=errors
+        for job in direct_jobs:
+            key=url_key(job['url'])
+            if key not in seen and key not in archived_keys:
+                catalog.append(job);seen.add(key);stats['direct_jobs_added']+=1
+    except Exception as exc:
+        stats['direct_source_errors']=[str(exc)[:250]]
+    lever_jobs,lever_errors=lever_records()
+    stats['direct_source_errors'].extend(lever_errors)
+    for job in lever_jobs:
+        key=url_key(job['url'])
+        if key not in seen and key not in archived_keys:
+            catalog.append(job);seen.add(key);stats['lever_added']+=1
+    tasks,rejected=reviewed_direct_tasks()
+    stats['task_rejected']=rejected
+    for task in tasks:
+        key=url_key(task['url'])
+        if key not in seen and key not in archived_keys:
+            catalog.append(task);seen.add(key);stats['task_added']+=1
+    # Crypto listings must be reviewed individual offers, never guessed from platform directories.
+    crypto_offers,crypto_rejected=reviewed_crypto_records(ROOT / 'crypto-opportunities-reviewed.json')
+    stats['crypto_rejected']=crypto_rejected
+    for offer in crypto_offers:
+        key=url_key(offer['url'])
+        if key not in seen and key not in archived_keys:
+            catalog.append(offer);seen.add(key);stats['crypto_added']+=1
     kept=[]
     for item in catalog:
         key=url_key(item.get('url'))
@@ -193,6 +332,12 @@ def main():
             else:
                 item['verification_status']='platform_catalog_not_live_offer'
             item['verified']=False
+    # Do not claim employer postings are currently open when they have gone stale.
+    for item in kept:
+        if item.get('source')=='Greenhouse employer board':
+            age=parse_date(item.get('last_discovered_at'))
+            if age and (NOW-age).days>=STALE_DAYS:
+                item['verification_status']='stale_employer_posting_review_needed'
     # Dedupe existing duplicates, preferring the earliest catalog entry.
     deduped=[]; keys=set()
     for item in kept:
