@@ -1,1 +1,70 @@
-[]
+[
+  {
+    "id": 9,
+    "name": "Prolific",
+    "company": "Prolific",
+    "description": "Paid academic research studies.",
+    "url": "https://www.prolific.com/participants",
+    "source_url": "https://participant-help.prolific.com/en/articles/445007-who-can-participate-in-studies-on-prolific",
+    "category": "surveys",
+    "countries": [
+      "Canada"
+    ],
+    "opportunity_type": "earning_platform",
+    "listing_kind": "platform",
+    "payout": "Not guaranteed",
+    "payout_terms": "Prolific states a minimum study rate of £6/US$8 per hour and PayPal cashouts of approved balances starting at £6/US$6 combined. Earnings and admission are not guaranteed.",
+    "payout_evidence_status": "official_terms_confirmed",
+    "verified": true,
+    "published": true,
+    "review_status": "approved",
+    "verification_status": "approved_for_publication",
+    "source_status": "confirmed_active",
+    "requirements_verified": true,
+    "country_eligibility_verified": true,
+    "start_requirements": "Must be over 18, reside in a supported country, join the participant waitlist if required, and complete account verification.",
+    "verification_evidence": {
+      "requirements_quote": "You must be over 18 years old, with a created and verified account, to take part in studies.",
+      "requirements_source_url": "https://participant-help.prolific.com/en/articles/445007-who-can-participate-in-studies-on-prolific",
+      "payout_source_url": "https://participant-help.prolific.com/en/articles/445062-how-do-i-cash-out-on-prolific"
+    },
+    "requires_deposit": false,
+    "requires_seed_phrase": false,
+    "verified_at": "2026-11-13T21:46:37.088145+00:00",
+    "verification_expires_at": "2026-11-20T21:46:37.088145+00:00"
+  },
+  {
+    "id": 15,
+    "name": "User Interviews",
+    "company": "User Interviews",
+    "description": "Paid research participation.",
+    "url": "https://www.userinterviews.com",
+    "source_url": "https://support.userinterviews.com/hc/en-us/articles/51535822654099-Countries-where-you-can-participate-in-studies",
+    "category": "surveys",
+    "countries": [
+      "Canada"
+    ],
+    "opportunity_type": "earning_platform",
+    "listing_kind": "platform",
+    "payout": "Not guaranteed",
+    "payout_terms": "Study-dependent incentives, either digital gift cards distributed by User Interviews or researcher-selected payments. Generally up to 10 business days, with exceptions noted by the researcher. No guaranteed selection or earnings.",
+    "payout_evidence_status": "official_terms_confirmed",
+    "verified": true,
+    "published": true,
+    "review_status": "approved",
+    "verification_status": "approved_for_publication",
+    "source_status": "confirmed_active",
+    "requirements_verified": true,
+    "country_eligibility_verified": true,
+    "start_requirements": "Create a participant account, complete your profile, apply to research studies, and pass any required screening. Must meet the study-specific eligibility criteria.",
+    "verification_evidence": {
+      "requirements_quote": "All you need to do is create a participant account, verify your phone number, and start applying to studies.",
+      "requirements_source_url": "https://support.userinterviews.com/hc/en-us/articles/51535829031571-Create-a-participant-account",
+      "payout_source_url": "https://support.userinterviews.com/hc/en-us/articles/51535828055699-Learn-how-and-when-you-ll-receive-your-incentive-payment"
+    },
+    "requires_deposit": false,
+    "requires_seed_phrase": false,
+    "verified_at": "2026-11-13T23:03:39.008470+00:00",
+    "verification_expires_at": "2026-11-20T23:03:39.008470+00:00"
+  }
+]
