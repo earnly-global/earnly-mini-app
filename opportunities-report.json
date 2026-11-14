@@ -1,12 +1,12 @@
 {
-  "run_at": "2026-11-14T01:06:25.578436+00:00",
+  "run_at": "2026-11-14T07:06:03.098062+00:00",
   "new_platforms": 0,
   "new_jobs": 0,
   "archived_jobs": 0,
   "page_checks": 8,
   "source_ok": true,
   "source_error": null,
-  "direct_jobs_added": 3,
+  "direct_jobs_added": 0,
   "direct_source_errors": [
     "sezzle: Unterminated string starting at: line 1 column 2987094 (char 2987093)"
   ],
