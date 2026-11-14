@@ -1,1 +1,26 @@
-{"run_at": null, "source_ok": false, "new_jobs": null, "archived_jobs": null}
+{
+  "run_at": "2026-11-14T01:06:25.578436+00:00",
+  "new_platforms": 0,
+  "new_jobs": 0,
+  "archived_jobs": 0,
+  "page_checks": 8,
+  "source_ok": true,
+  "source_error": null,
+  "direct_jobs_added": 3,
+  "direct_source_errors": [
+    "sezzle: Unterminated string starting at: line 1 column 2987094 (char 2987093)"
+  ],
+  "crypto_added": 0,
+  "crypto_rejected": [],
+  "lever_added": 0,
+  "task_added": 0,
+  "task_rejected": [],
+  "quality_counts": {
+    "platform_pages": 8,
+    "remote_jobs": 197,
+    "individual_tasks": 0,
+    "needs_page_review": 0
+  },
+  "catalog_total": 205,
+  "archive_total": 0
+}
