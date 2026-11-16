@@ -1,16 +1,15 @@
 
 #!/usr/bin/env python3
-"""Earnly V2: website checks and official-source evidence collection."""
+"""Earnly V3: collect targeted evidence without automatic approval."""
 
 import datetime as dt
-import hashlib
 import html
 import json
 import os
 import re
 import urllib.error
 import urllib.request
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, urlencode
 
 BASE = os.environ["SUPABASE_URL"].rstrip("/")
 KEY = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
@@ -22,28 +21,39 @@ HEADERS = {
     "Accept": "application/json",
 }
 
-# Official documentation sources. Add more only after checking
-# that the URLs belong to the platform or its official help center.
-OFFICIAL_SOURCES = {
+# Candidate official pages, not confirmed evidence of specific terms.
+SOURCES = {
     "CloudResearch Connect": [
         "https://connect-participant-help.cloudresearch.com/hc/en-us"
     ],
-    "Freecash": [
-        "https://freecash.com"
-    ],
-    "PlaytestCloud": [
-        "https://players.playtestcloud.com"
-    ],
-    "Respondent": [
-        "https://www.respondent.io"
-    ],
-    "Swagbucks": [
-        "https://www.swagbucks.com"
-    ],
+    "Freecash": ["https://freecash.com"],
+    "PlaytestCloud": ["https://players.playtestcloud.com"],
+    "Respondent": ["https://www.respondent.io"],
+    "Swagbucks": ["https://www.swagbucks.com"],
     "UserTesting": [
         "https://www.usertesting.com/get-paid-to-test"
     ],
 }
+
+PATTERNS = {
+    "country_eligibility": (
+        r"\b(canada|canadian|eligible countries|"
+        r"supported countries|countries supported|"
+        r"country restrictions|residents of)\b"
+    ),
+    "payout_terms": (
+        r"\b(paypal|cashout|cash out|withdrawal|"
+        r"minimum payout|gift card|payment method|"
+        r"paid via|payout threshold)\b"
+    ),
+    "registration_requirements": (
+        r"\b(18 years|age requirement|sign up|"
+        r"register|identity verification|"
+        r"account verification|waitlist|"
+        r"application process)\b"
+    ),
+}
+
 
 def api(path, method="GET", payload=None):
     data = None if payload is None else json.dumps(payload).encode()
@@ -54,65 +64,111 @@ def api(path, method="GET", payload=None):
         method=method,
     )
     with urllib.request.urlopen(req, timeout=30) as response:
-        body = response.read()
-        return json.loads(body) if body else None
+        raw = response.read()
+        return json.loads(raw) if raw else None
+
 
 def fetch_page(url):
     parsed = urlsplit(url)
+
     if parsed.scheme != "https" or not parsed.hostname:
         return "fail", "", "Invalid HTTPS URL"
 
     try:
-        req = urllib.request.Request(
+        request = urllib.request.Request(
             url,
             headers={
-                "User-Agent": "EarnlyVerifier/2.0",
+                "User-Agent": "EarnlyVerifier/3.0",
                 "Accept": "text/html",
             },
         )
-        with urllib.request.urlopen(req, timeout=12) as response:
-            if not 200 <= response.status < 400:
-                return "unknown", "", "Unexpected HTTP status"
 
-            content_type = response.headers.get("Content-Type", "")
-            if "text/html" not in content_type.lower():
-                return "unknown", "", "Non-HTML response"
+        with urllib.request.urlopen(
+            request, timeout=12
+        ) as response:
+            final_url = response.geturl()
+
+            # Do not accept a redirect to an unrelated domain.
+            original = urlsplit(url).hostname or ""
+            final = urlsplit(final_url)
+
+            if (
+                final.scheme != "https"
+                or not final.hostname
+                or not (
+                    final.hostname == original
+                    or final.hostname.endswith("." + original)
+                )
+            ):
+                return "unknown", "", "Redirect requires review"
+
+            content_type = response.headers.get(
+                "Content-Type", ""
+            ).lower()
+
+            if "text/html" not in content_type:
+                return "unknown", "", "Not an HTML page"
 
             raw = response.read(500_001)
-            if len(raw) > 500_000:
-                return "unknown", "", "Page exceeds size limit"
 
-            charset = response.headers.get_content_charset() or "utf-8"
+            if len(raw) > 500_000:
+                return "unknown", "", "Page too large"
+
+            charset = (
+                response.headers.get_content_charset()
+                or "utf-8"
+            )
             page = raw.decode(charset, errors="replace")
 
-            # Strip scripts and markup; retain readable text.
-            page = re.sub(
-                r"<(script|style)\b[^>]*>.*?</\1>",
-                " ",
-                page,
-                flags=re.I | re.S,
-            )
-            page = re.sub(r"<[^>]+>", " ", page)
-            page = html.unescape(page)
-            page = re.sub(r"\s+", " ", page).strip()
+        page = re.sub(
+            r"<(script|style|noscript)\b[^>]*>.*?</\1>",
+            " ",
+            page,
+            flags=re.I | re.S,
+        )
+        page = re.sub(r"<[^>]+>", " ", page)
+        page = html.unescape(page)
+        page = re.sub(r"\s+", " ", page).strip()
 
-            return "pass", page, "Official page responded"
+        if not page:
+            return "unknown", "", "No readable text"
+
+        return "pass", page, "HTML page accessible"
 
     except urllib.error.HTTPError as exc:
         if exc.code in (404, 410):
             return "fail", "", f"HTTP {exc.code}"
         return "unknown", "", f"HTTP {exc.code}"
-    except Exception:
-        return "unknown", "", "Page could not be retrieved"
+    except Exception as exc:
+        return "unknown", "", (
+            f"Fetch error: {type(exc).__name__}"
+        )
 
-def save_evidence(listing, url, check_type, result, note):
+
+def find_excerpts(text, pattern, limit=3):
+    excerpts = []
+    for match in re.finditer(pattern, text, re.I):
+        start = max(0, match.start() - 130)
+        end = min(len(text), match.end() + 220)
+        excerpt = text[start:end].strip()
+
+        if excerpt not in excerpts:
+            excerpts.append(excerpt[:350])
+
+        if len(excerpts) >= limit:
+            break
+
+    return excerpts
+
+
+def save_evidence(listing, url, kind, result, note):
     now = dt.datetime.now(dt.timezone.utc)
 
     payload = {
         "listing_id": listing["id"],
         "source_url": url,
         "source_hash": listing["source_hash"],
-        "check_type": check_type,
+        "check_type": kind,
         "result": result,
         "evidence_text": note[:2000],
         "checked_at": now.isoformat(),
@@ -127,14 +183,18 @@ def save_evidence(listing, url, check_type, result, note):
         payload=payload,
     )
 
+
 def main():
+    query = urlencode({
+        "select": "id,name,url,source_hash",
+        "listing_kind": "eq.platform",
+        "review_status": "eq.pending_review",
+        "order": "id.asc",
+        "limit": "50",
+    })
+
     listings = api(
-        "/rest/v1/earnly_discovery_catalog"
-        "?select=id,name,url,source_hash"
-        "&listing_kind=eq.platform"
-        "&review_status=eq.pending_review"
-        "&order=id.asc"
-        "&limit=50"
+        "/rest/v1/earnly_discovery_catalog?" + query
     )
 
     summary = []
@@ -150,15 +210,15 @@ def main():
             note,
         )
 
-        source_results = []
+        sources = []
 
-        for source_url in OFFICIAL_SOURCES.get(listing["name"], []):
-            source_status, source_text, source_note = fetch_page(
-                source_url
+        for source_url in SOURCES.get(
+            listing["name"], []
+        ):
+            source_status, source_text, source_note = (
+                fetch_page(source_url)
             )
 
-            # A fetched page is evidence of accessibility,
-            # not proof of eligibility or payment.
             save_evidence(
                 listing,
                 source_url,
@@ -167,45 +227,58 @@ def main():
                 source_note,
             )
 
-            # Record possible evidence for later structured review.
-            # Never turn keyword matches into automatic approval.
-            excerpt = source_text[:1000] if source_text else ""
+            found = {}
 
-            save_evidence(
-                listing,
-                source_url,
-                "eligibility_document_review",
-                "unknown",
-                "Official documentation requires structured "
-                "eligibility review. Page excerpt: " + excerpt,
-            )
+            for kind, pattern in PATTERNS.items():
+                excerpts = (
+                    find_excerpts(source_text, pattern)
+                    if source_status == "pass"
+                    else []
+                )
 
-            save_evidence(
-                listing,
-                source_url,
-                "payout_document_review",
-                "unknown",
-                "Official documentation requires structured "
-                "payout review. Page excerpt: " + excerpt,
-            )
+                note = json.dumps({
+                    "page_access": source_status,
+                    "candidate_excerpts": excerpts,
+                    "assessment": (
+                        "Evidence requires contextual validation; "
+                        "keyword matches do not establish eligibility "
+                        "or payment."
+                    ),
+                }, ensure_ascii=False)
 
-            source_results.append({
-                "source": source_url,
+                # Deliberately unknown: no unsupported approvals.
+                save_evidence(
+                    listing,
+                    source_url,
+                    kind,
+                    "unknown",
+                    note,
+                )
+
+                found[kind] = len(excerpts)
+
+            sources.append({
+                "url": source_url,
                 "access": source_status,
+                "candidate_excerpts": found,
             })
 
         summary.append({
             "name": listing["name"],
             "website": status,
-            "documentation": source_results,
+            "sources": sources,
         })
 
     print(json.dumps({
         "checked": len(summary),
         "results": summary,
         "approvals_changed": 0,
-        "note": "Evidence collection only; no automatic publication."
+        "note": (
+            "Candidate evidence only. "
+            "No automatic publication."
+        ),
     }, indent=2))
+
 
 if __name__ == "__main__":
     main()
