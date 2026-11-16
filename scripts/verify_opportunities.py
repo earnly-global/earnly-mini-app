@@ -1,9 +1,9 @@
 
 #!/usr/bin/env python3
-"""Earnly V4: configurable official-source evidence collection.
+"""Earnly V4.1: configurable official-source evidence collection.
 
-Reads verification-sources.json from the repository root.
 Collects candidate evidence without automatically approving listings.
+Handles larger HTML pages using a bounded read.
 """
 
 import datetime as dt
@@ -56,7 +56,7 @@ SOURCE_CATEGORIES = {
 
 
 def load_sources():
-    """Load and validate the official-source configuration."""
+    """Load and validate the source configuration."""
     with CONFIG_PATH.open(encoding="utf-8") as file:
         config = json.load(file)
 
@@ -140,7 +140,7 @@ def fetch_page(url):
         request = urllib.request.Request(
             url,
             headers={
-                "User-Agent": "EarnlyVerifier/4.0",
+                "User-Agent": "EarnlyVerifier/4.1",
                 "Accept": "text/html",
             },
         )
@@ -180,13 +180,15 @@ def fetch_page(url):
                     "Response is not HTML",
                 )
 
-            raw = response.read(500_001)
+            # V4.1: Read up to 1 MB of HTML instead of
+            # rejecting pages larger than 500 KB.
+            raw = response.read(1_000_000)
 
-            if len(raw) > 500_000:
+            if not raw:
                 return (
                     "unknown",
                     "",
-                    "Page exceeds size limit",
+                    "Empty HTML response",
                 )
 
             charset = (
@@ -286,7 +288,7 @@ def collect_source_evidence(
     source_url,
     categories,
 ):
-    """Check one source and record only its configured categories."""
+    """Check one source and record its configured categories."""
     status, text, note = fetch_page(source_url)
 
     save_evidence(
@@ -406,8 +408,7 @@ def main():
         "results": summary,
         "approvals_changed": 0,
         "note": (
-            "V4 source-specific candidate evidence "
-            "collection completed. "
+            "V4.1 evidence collection completed. "
             "No automatic publication."
         ),
     }, indent=2))
