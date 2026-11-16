@@ -542,25 +542,66 @@ function renderFeatured(){
   opportunities.slice(0,3).forEach(item=>container.appendChild(makeCard(item)));
 }
 
-fetch("opportunities-approved.json",{cache:"no-store"})
-  .then(response=>{
-    if(!response.ok)throw new Error("Cannot load data");
-    return response.json();
-  })
-  .then(data=>{
-    const list=Array.isArray(data)?data:
-      Array.isArray(data.opportunities)?data.opportunities:[];
-    opportunities=list.filter(isApprovedOpportunity);
+
+const EARNLY_PUBLIC_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+
+async function loadApprovedOpportunities() {
+  try {
+    const [catalogResponse, approvalResponse] = await Promise.all([
+      fetch("opportunities-approved.json", { cache: "no-store" }),
+      fetch(
+        "https://byywbcwdhtiylexvqokj.supabase.co/rest/v1/rpc/earnly_public_approved_urls",
+        {
+          method: "POST",
+          cache: "no-store",
+          headers: {
+            "apikey": EARNLY_PUBLIC_KEY,
+            "Content-Type": "application/json"
+          },
+          body: "{}"
+        }
+      )
+    ]);
+
+    if (!catalogResponse.ok || !approvalResponse.ok) {
+      throw new Error("Approval service unavailable");
+    }
+
+    const catalog = await catalogResponse.json();
+    const approved = await approvalResponse.json();
+
+    if (!Array.isArray(approved)) {
+      throw new Error("Invalid approval response");
+    }
+
+    const approvedUrls = new Set(approved.map(row => row.url));
+    const listings = Array.isArray(catalog)
+      ? catalog
+      : Array.isArray(catalog.opportunities)
+        ? catalog.opportunities
+        : [];
+
+    opportunities = listings.filter(item =>
+      isApprovedOpportunity(item) && approvedUrls.has(item.url)
+    );
+
     renderListings();
     renderSaved();
-    renderSocialFeed();
+    renderFeatured();
     renderVipShortlist();
-  })
-  .catch(()=>{
-    document.getElementById("listings").textContent=
-      "Verified opportunities are temporarily unavailable. Please try again later.";
-    renderSocialFeed();
-  });
+
+  } catch (error) {
+    console.error("Earnly approval check:", error);
+    opportunities = [];
+    renderListings();
+    renderSaved();
+    renderFeatured();
+    renderVipShortlist();
+  }
+}
+
+loadApprovedOpportunities();
+
 
 
 
