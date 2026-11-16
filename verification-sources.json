@@ -1,0 +1,49 @@
+
+{
+  "CloudResearch Connect": {
+    "registration": [
+      "https://connect-participant-help.cloudresearch.com/hc/en-us"
+    ],
+    "country_eligibility": [],
+    "payout_terms": []
+  },
+  "Freecash": {
+    "registration": [
+      "https://freecash.com"
+    ],
+    "country_eligibility": [],
+    "payout_terms": []
+  },
+  "PlaytestCloud": {
+    "registration": [
+      "https://players.playtestcloud.com"
+    ],
+    "country_eligibility": [],
+    "payout_terms": []
+  },
+  "Respondent": {
+    "registration": [
+      "https://www.respondent.io"
+    ],
+    "country_eligibility": [],
+    "payout_terms": []
+  },
+  "Swagbucks": {
+    "registration": [
+      "https://www.swagbucks.com"
+    ],
+    "country_eligibility": [],
+    "payout_terms": []
+  },
+  "UserTesting": {
+    "registration": [
+      "https://support.usertesting.com/hc/en-us/articles/4405063917075-Applicant-FAQ"
+    ],
+    "country_eligibility": [
+      "https://support.usertesting.com/hc/en-us/articles/4405064296083-I-don-t-live-in-the-United-States-Can-I-still-apply"
+    ],
+    "payout_terms": [
+      "https://support.usertesting.com/hc/en-us/articles/4405116832019-FAQ-Payments"
+    ]
+  }
+}
