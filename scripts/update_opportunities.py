@@ -67,7 +67,12 @@ def fetch_json(url):
     req = urllib.request.Request(url,headers={'User-Agent':USER_AGENT,'Accept':'application/json'})
     with urllib.request.urlopen(req,timeout=18) as response:
         if response.status != 200: raise RuntimeError(f'HTTP {response.status}')
-        return json.loads(response.read(3_000_000))
+        
+        raw = response.read(10_000_001)
+        if len(raw) > 10_000_000:
+            raise ValueError("JSON response exceeds 10 MB limit")
+        return json.loads(raw)
+
 
 def probe(url):
     """Checks whether a landing page responds; NEVER asserts pay, legitimacy or open tasks."""
