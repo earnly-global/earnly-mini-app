@@ -82,8 +82,8 @@ button:disabled{opacity:.55;cursor:not-allowed}
   </select>
 
 <label for="country">🌍 Your Country</label>
-<select id="country" onchange="renderListings()">
-  <option value="all">All countries</option>
+<select id="country" disabled aria-label="Saved country of residence">
+  <option value="all">Select your residence in Welcome screen</option>
   <option value="Canada">🇨🇦 Canada</option>
   <option value="United States">🇺🇸 United States</option>
   <option value="United Kingdom">🇬🇧 United Kingdom</option>
@@ -465,6 +465,62 @@ link.style.color="#071c29";
   return card;
 }
 
+// Country Matching V2 — apply residence eligibility to every public feed.
+// This is a display filter, not an authorization or eligibility verification engine.
+const EARNLY_RESIDENCE_KEY = "earnly_residence_country_v1";
+const EARNLY_WORLDWIDE_KEY = "earnly_include_worldwide_v1";
+let earnlyApprovedCatalog = [];
+
+function earnlyResidence() {
+  try { return (localStorage.getItem(EARNLY_RESIDENCE_KEY) || "").trim(); }
+  catch { return ""; }
+}
+function earnlyWantsWorldwide() {
+  try { return localStorage.getItem(EARNLY_WORLDWIDE_KEY) !== "false"; }
+  catch { return true; }
+}
+function earnlyNormalizedCountry(value) {
+  const aliases = {"usa":"united states","us":"united states","u.s.":"united states", "uk":"united kingdom","u.k.":"united kingdom"};
+  const cleaned = String(value || "").trim().toLowerCase();
+  return aliases[cleaned] || cleaned;
+}
+function earnlyCountryMatch(item) {
+  // The existing publication gate requires country_eligibility_verified === true.
+  // A blank/unknown location is NEVER interpreted as unrestricted remote work.
+  if (!isApprovedOpportunity(item)) return false;
+  const residence = earnlyNormalizedCountry(earnlyResidence());
+  if (!residence) return false;
+  const countries = Array.isArray(item.countries)
+    ? item.countries.map(earnlyNormalizedCountry) : [];
+  if (countries.includes(residence)) return true;
+  return earnlyWantsWorldwide() && countries.includes("worldwide");
+}
+function earnlyRefreshCountryViews() {
+  opportunities = earnlyApprovedCatalog.filter(earnlyCountryMatch);
+  const selectedCountry = earnlyResidence();
+  const select = document.getElementById("country");
+  if (select && selectedCountry) {
+    let option = Array.from(select.options).find(o => earnlyNormalizedCountry(o.value) === earnlyNormalizedCountry(selectedCountry));
+    if (!option) {
+      option = document.createElement("option");
+      option.value = selectedCountry;
+      option.textContent = selectedCountry;
+      select.appendChild(option);
+    }
+    select.value = option.value;
+  }
+  renderListings();
+  renderSaved();
+  renderFeatured();
+  if (typeof renderSocialFeed === "function") renderSocialFeed();
+  renderVipShortlist();
+  renderVipPlanner();
+  if (typeof renderActivity === "function") renderActivity();
+  if (document.getElementById("quality")?.classList.contains("active")) renderQuality();
+}
+window.addEventListener("earnly:country-changed", earnlyRefreshCountryViews);
+// The onboarding script runs after the main script; its event updates all feeds.
+
 function renderListings(){
   const container=document.getElementById("listings");
   const search=document.getElementById("search").value.toLowerCase();
@@ -485,18 +541,9 @@ let results = opportunities.filter(isApprovedOpportunity).filter(item => {
         String(value || "").toLowerCase().includes(search)
       );
 
-  const countries = Array.isArray(item.countries)
-    ? item.countries.map(c => String(c).toLowerCase().trim())
-    : [];
-
-  const selected = country.toLowerCase();
-
-  const matchesCountry =
-    country === "all" ||
-    (selected === "worldwide"
-      ? countries.includes("worldwide")
-      : countries.includes(selected) ||
-        countries.includes("worldwide"));
+  // The global public catalog was already filtered by saved residence.
+  // Do not let the Explore dropdown bypass residence eligibility.
+  const matchesCountry = earnlyCountryMatch(item);
 
   const matchesType=!hasTier('premium')||listingType==='all'||(listingType==='job' ? isJobListing(item) : listingType==='direct'?isDirectOpportunity(item):isPlatformSignup(item));
   const matchesData=!hasTier('premium')||dataFilter==='all'||(dataFilter==='time'?parseMinutes(item.estimated_time)!==null:isCountryKnown(item));
@@ -581,22 +628,15 @@ async function loadApprovedOpportunities() {
         ? catalog.opportunities
         : [];
 
-    opportunities = listings.filter(item =>
+    earnlyApprovedCatalog = listings.filter(item =>
       isApprovedOpportunity(item) && approvedUrls.has(item.url)
     );
-
-    renderListings();
-    renderSaved();
-    renderFeatured();
-    renderVipShortlist();
+    earnlyRefreshCountryViews();
 
   } catch (error) {
     console.error("Earnly approval check:", error);
-    opportunities = [];
-    renderListings();
-    renderSaved();
-    renderFeatured();
-    renderVipShortlist();
+    earnlyApprovedCatalog = [];
+    earnlyRefreshCountryViews();
   }
 }
 
