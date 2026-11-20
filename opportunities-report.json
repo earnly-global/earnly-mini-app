@@ -1,5 +1,5 @@
 {
-  "run_at": "2026-11-20T07:24:34.940238+00:00",
+  "run_at": "2026-11-20T13:19:38.689102+00:00",
   "new_platforms": 0,
   "new_jobs": 0,
   "archived_jobs": 0,
@@ -15,10 +15,10 @@
   "task_rejected": [],
   "quality_counts": {
     "platform_pages": 8,
-    "remote_jobs": 277,
+    "remote_jobs": 278,
     "individual_tasks": 0,
     "needs_page_review": 0
   },
-  "catalog_total": 285,
+  "catalog_total": 286,
   "archive_total": 0
 }
