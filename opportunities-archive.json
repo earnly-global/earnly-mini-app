@@ -1,1 +1,28 @@
-[]
+[
+  {
+    "name": "Remote Office Assistant",
+    "company": "Coalition Technologies ",
+    "category": "jobs",
+    "opportunity_type": "remote_job",
+    "description": "Remote job listing. Check qualifications, location restrictions, and application status on the provider page.",
+    "url": "https://remotive.com/remote-jobs/marketing/remote-office-assistant-1680495",
+    "payout": "Unverified",
+    "payment": "Unverified",
+    "countries": [
+      "Not verified"
+    ],
+    "verified": false,
+    "source": "Remotive",
+    "source_location_text": "Worldwide",
+    "source_published_at": "2026-10-11T20:17:27",
+    "last_discovered_at": "2026-11-12T08:15:59.375367+00:00",
+    "verification_status": "discovered_not_independently_verified",
+    "quality_type": "remote_job",
+    "payout_evidence": "not_verified",
+    "eligibility_evidence": "not_verified",
+    "task_availability": "not_verified",
+    "website_check_note": "Website availability unknown or not checked",
+    "archive_reason": "older_than_45_days_unconfirmed_open",
+    "archived_at": "2026-11-26T01:23:49.890551+00:00"
+  }
+]
